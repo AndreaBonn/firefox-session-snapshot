@@ -258,7 +258,8 @@ async function handleMenuAction(action, sessionId) {
     }
 
     if (action === "delete") {
-      if (confirm("Eliminare questa sessione?")) {
+      const confirmed = await showConfirm("Eliminare questa sessione?");
+      if (confirmed) {
         await browser.runtime.sendMessage({ action: "delete-session", sessionId });
         await loadSessions();
       }
@@ -315,6 +316,33 @@ function startInlineRename(sessionId) {
   });
 
   input.addEventListener("blur", confirmRename);
+}
+
+// --- Confirm dialog ---
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById("ss-confirm-overlay");
+    const msg = document.getElementById("ss-confirm-message");
+    const okBtn = document.getElementById("ss-confirm-ok");
+    const cancelBtn = document.getElementById("ss-confirm-cancel");
+
+    msg.textContent = message;
+    overlay.classList.remove("hidden");
+
+    function cleanup(result) {
+      overlay.classList.add("hidden");
+      okBtn.removeEventListener("click", onOk);
+      cancelBtn.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+
+    okBtn.addEventListener("click", onOk);
+    cancelBtn.addEventListener("click", onCancel);
+  });
 }
 
 // --- Utilities ---

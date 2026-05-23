@@ -344,6 +344,71 @@ body {
   box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
 }
 
+/* --- Confirm dialog --- */
+
+#ss-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ss-confirm-overlay.hidden {
+  display: none;
+}
+
+#ss-confirm-dialog {
+  background: var(--ss-bg);
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  padding: 16px;
+  width: 280px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+#ss-confirm-message {
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+#ss-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#ss-confirm-cancel {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--ss-border);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ss-text-primary);
+}
+
+#ss-confirm-cancel:hover {
+  background: var(--ss-hover);
+}
+
+#ss-confirm-ok {
+  padding: 6px 12px;
+  background: var(--ss-danger);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#ss-confirm-ok:hover {
+  background: var(--ss-danger-hover);
+}
+
 /* --- Empty state --- */
 
 #ss-empty-state {
