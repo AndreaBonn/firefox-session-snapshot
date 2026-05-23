@@ -1,0 +1,60 @@
+{
+  "manifest_version": 2,
+  "name": "Session Snapshot",
+  "version": "1.0.0",
+  "description": "Salva e ripristina sessioni di lavoro per progetto. Ogni sessione ricorda schede e posizione di scroll.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab"
+  ],
+  "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
+  "background": {
+    "scripts": ["background/validation.js", "background/background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    },
+    "default_title": "Session Snapshot"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/scroll-capture.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "save-session": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "MacCtrl+Shift+S"
+      },
+      "description": "Salva rapidamente la sessione corrente"
+    },
+    "open-popup": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+W",
+        "mac": "MacCtrl+Shift+W"
+      },
+      "description": "Apri Session Snapshot"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "session-snapshot@extension",
+      "strict_min_version": "91.0"
+    }
+  }
+}

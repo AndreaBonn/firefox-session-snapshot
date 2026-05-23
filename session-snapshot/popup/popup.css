@@ -1,0 +1,357 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ss-bg: #ffffff;
+  --ss-bg-secondary: #f6f8fa;
+  --ss-border: #d0d7de;
+  --ss-text-primary: #24292f;
+  --ss-text-secondary: #57606a;
+  --ss-accent: #0969da;
+  --ss-accent-hover: #0550ae;
+  --ss-danger: #cf222e;
+  --ss-danger-hover: #a40e26;
+  --ss-hover: #f3f4f6;
+  --ss-radius: 8px;
+  --ss-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ss-bg: #1c1e23;
+    --ss-bg-secondary: #282b33;
+    --ss-border: #3d4147;
+    --ss-text-primary: #e6edf3;
+    --ss-text-secondary: #8b949e;
+    --ss-accent: #58a6ff;
+    --ss-accent-hover: #79b8ff;
+    --ss-danger: #ff7b72;
+    --ss-danger-hover: #ffa198;
+    --ss-hover: #2d3139;
+  }
+}
+
+body {
+  width: 360px;
+  min-height: 200px;
+  max-height: 520px;
+  background: var(--ss-bg);
+  color: var(--ss-text-primary);
+  font-family: var(--ss-font);
+  font-size: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* --- Header --- */
+
+#ss-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ss-border);
+  background: var(--ss-bg);
+}
+
+#ss-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#ss-logo img {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Save section --- */
+
+#ss-save-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ss-border);
+}
+
+#ss-save-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--ss-accent);
+  color: white;
+  border: none;
+  border-radius: var(--ss-radius);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+#ss-save-btn:hover {
+  background: var(--ss-accent-hover);
+}
+
+#ss-session-name {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius);
+  background: var(--ss-bg);
+  color: var(--ss-text-primary);
+  font-size: 14px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+#ss-session-name:focus {
+  border-color: var(--ss-accent);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+}
+
+/* --- Color picker --- */
+
+#ss-color-picker {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ss-color-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.ss-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.ss-color-dot.selected {
+  border-color: var(--ss-text-primary);
+}
+
+/* --- Save actions --- */
+
+#ss-save-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#ss-save-confirm {
+  flex: 1;
+  padding: 6px 12px;
+  background: var(--ss-accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#ss-save-confirm:hover {
+  background: var(--ss-accent-hover);
+}
+
+#ss-save-cancel {
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--ss-text-secondary);
+  border: 1px solid var(--ss-border);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#ss-save-cancel:hover {
+  background: var(--ss-hover);
+}
+
+/* --- Sessions list --- */
+
+#ss-sessions-section {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#ss-sessions-header {
+  padding: 10px 16px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ss-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ss-session-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: default;
+  border-bottom: 1px solid var(--ss-border);
+  transition: background 0.1s;
+  position: relative;
+}
+
+.ss-session-item:hover {
+  background: var(--ss-hover);
+}
+
+.ss-session-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ss-session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-session-name {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-session-meta {
+  font-size: 12px;
+  color: var(--ss-text-secondary);
+  margin-top: 2px;
+}
+
+.ss-session-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.ss-session-item:hover .ss-session-actions {
+  opacity: 1;
+}
+
+.ss-restore-btn {
+  padding: 4px 10px;
+  background: var(--ss-accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ss-restore-btn:hover {
+  background: var(--ss-accent-hover);
+}
+
+.ss-menu-btn {
+  padding: 4px 6px;
+  background: transparent;
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--ss-text-secondary);
+  transition: background 0.15s;
+}
+
+.ss-menu-btn:hover {
+  background: var(--ss-hover);
+}
+
+/* --- Context menu --- */
+
+.ss-context-menu {
+  position: absolute;
+  right: 16px;
+  top: 100%;
+  background: var(--ss-bg);
+  border: 1px solid var(--ss-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.ss-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ss-text-primary);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ss-menu-item:hover {
+  background: var(--ss-hover);
+}
+
+.ss-menu-item.ss-danger {
+  color: var(--ss-danger);
+}
+
+.ss-menu-item.ss-danger:hover {
+  background: rgba(207, 34, 46, 0.08);
+}
+
+.ss-context-menu hr {
+  border: none;
+  border-top: 1px solid var(--ss-border);
+  margin: 0;
+}
+
+/* --- Inline rename --- */
+
+.ss-rename-input {
+  width: 100%;
+  padding: 2px 4px;
+  border: 1px solid var(--ss-accent);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--ss-font);
+  background: var(--ss-bg);
+  color: var(--ss-text-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
+}
+
+/* --- Empty state --- */
+
+#ss-empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--ss-text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}

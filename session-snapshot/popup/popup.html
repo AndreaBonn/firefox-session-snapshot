@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Snapshot</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header id="ss-header">
+    <div id="ss-logo">
+      <img src="../icons/icon-32.png" alt="" />
+      <span>Session Snapshot</span>
+    </div>
+  </header>
+
+  <div id="ss-save-section">
+    <div id="ss-save-collapsed">
+      <button id="ss-save-btn">
+        <span>+</span> Salva sessione corrente
+      </button>
+    </div>
+    <div id="ss-save-expanded" class="hidden">
+      <input
+        id="ss-session-name"
+        type="text"
+        placeholder="Nome sessione (es. Progetto A)"
+        maxlength="50"
+      />
+      <div id="ss-color-picker"></div>
+      <div id="ss-save-actions">
+        <button id="ss-save-confirm">Salva</button>
+        <button id="ss-save-cancel">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ss-sessions-section">
+    <div id="ss-sessions-header">
+      <span id="ss-sessions-count">Le tue sessioni</span>
+    </div>
+    <div id="ss-sessions-list"></div>
+    <div id="ss-empty-state" class="hidden">
+      <p>Nessuna sessione salvata.</p>
+      <p>Clicca "+ Salva sessione corrente" per iniziare.</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

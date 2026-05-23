@@ -1,0 +1,32 @@
+{
+  "overrides": [
+    {
+      "files": ["validation.js"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["background.js"],
+      "globals": {
+        "STORAGE_INDEX_KEY": "readonly",
+        "STORAGE_SESSION_PREFIX": "readonly",
+        "STORAGE_PENDING_SCROLL_KEY": "readonly",
+        "AUTO_COLORS": "readonly",
+        "EXCLUDED_URL_PREFIXES": "readonly",
+        "ALLOWED_URL_SCHEMES": "readonly",
+        "SESSION_ID_PATTERN": "readonly",
+        "HEX_COLOR_PATTERN": "readonly",
+        "MAX_SESSION_NAME_LENGTH": "readonly",
+        "MAX_SCROLL_VALUE": "readonly",
+        "isValidSessionId": "readonly",
+        "isValidColor": "readonly",
+        "sanitizeName": "readonly",
+        "sanitizeScroll": "readonly",
+        "isAllowedUrlScheme": "readonly",
+        "isExcludedUrl": "readonly",
+        "getAutoColor": "readonly"
+      }
+    }
+  ]
+}
