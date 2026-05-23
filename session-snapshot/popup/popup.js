@@ -203,17 +203,19 @@ function toggleContextMenu(sessionId) {
   const menuEl = wrapper.firstElementChild;
   document.body.appendChild(menuEl);
 
-  // Position relative to the menu button
+  // Position below the menu button, aligned to its right edge
   const btnRect = menuBtn.getBoundingClientRect();
-  const menuWidth = 200;
-  let top = btnRect.bottom + 4;
+  const menuHeight = menuEl.offsetHeight;
+  const menuWidth = menuEl.offsetWidth;
+
+  let top = btnRect.bottom + 2;
   let left = btnRect.right - menuWidth;
 
-  // Keep within popup bounds
-  if (left < 4) left = 4;
-  if (top + 160 > window.innerHeight) {
-    top = btnRect.top - 160;
+  // Flip above button if no room below
+  if (top + menuHeight > window.innerHeight) {
+    top = btnRect.top - menuHeight - 2;
   }
+  if (left < 4) left = 4;
 
   menuEl.style.top = `${top}px`;
   menuEl.style.left = `${left}px`;
