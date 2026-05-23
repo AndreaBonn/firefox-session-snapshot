@@ -155,20 +155,17 @@ function bindEvents() {
       return;
     }
 
+  });
+
+  // Context menu item clicks + close on click outside (menu is on body)
+  document.addEventListener("click", async (e) => {
+    const menuItem = e.target.closest(".ss-menu-item");
     if (menuItem) {
       const contextMenu = menuItem.closest(".ss-context-menu");
       await handleMenuAction(menuItem.dataset.action, contextMenu.dataset.id);
       return;
     }
 
-    // Click outside context menu closes it
-    if (openMenuId && !e.target.closest(".ss-context-menu")) {
-      closeContextMenu();
-    }
-  });
-
-  // Close context menu on click outside
-  document.addEventListener("click", (e) => {
     if (openMenuId && !e.target.closest(".ss-context-menu") && !e.target.closest(".ss-menu-btn")) {
       closeContextMenu();
     }
