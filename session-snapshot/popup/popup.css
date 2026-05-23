@@ -287,14 +287,12 @@ body {
 /* --- Context menu --- */
 
 .ss-context-menu {
-  position: absolute;
-  right: 16px;
-  top: 100%;
+  position: fixed;
   background: var(--ss-bg);
   border: 1px solid var(--ss-border);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  z-index: 400;
   min-width: 200px;
   overflow: hidden;
 }

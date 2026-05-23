@@ -197,9 +197,26 @@ function toggleContextMenu(sessionId) {
   const item = document.querySelector(`.ss-session-item[data-id="${sessionId}"]`);
   if (!item) return;
 
-  const menu = document.createElement("div");
-  menu.innerHTML = renderContextMenu(sessionId);
-  item.appendChild(menu.firstElementChild);
+  const menuBtn = item.querySelector(".ss-menu-btn");
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = renderContextMenu(sessionId);
+  const menuEl = wrapper.firstElementChild;
+  document.body.appendChild(menuEl);
+
+  // Position relative to the menu button
+  const btnRect = menuBtn.getBoundingClientRect();
+  const menuWidth = 200;
+  let top = btnRect.bottom + 4;
+  let left = btnRect.right - menuWidth;
+
+  // Keep within popup bounds
+  if (left < 4) left = 4;
+  if (top + 160 > window.innerHeight) {
+    top = btnRect.top - 160;
+  }
+
+  menuEl.style.top = `${top}px`;
+  menuEl.style.left = `${left}px`;
   openMenuId = sessionId;
 }
 
