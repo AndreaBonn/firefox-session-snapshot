@@ -1,5 +1,5 @@
 // Session Snapshot - Toast notification system
-// Provides undo-capable toast for destructive actions.
+// Provides undo-capable toast and informational toast.
 // Depends on: ui-utils.js (loaded before this file)
 
 const TOAST_DURATION_MS = 5000;
@@ -49,6 +49,25 @@ function showUndoToast(message, onConfirm, onUndo) {
   });
 
   activeToast = { toast, timeoutId, onConfirm };
+}
+
+function showInfoToast(message) {
+  dismissActiveToast();
+
+  const container = document.getElementById("ss-toast-container");
+  const toast = document.createElement("div");
+  toast.className = "ss-toast";
+  toast.setAttribute("role", "status");
+
+  toast.innerHTML = `<span class="ss-toast-message">${escapeHtml(message)}</span>`;
+  container.appendChild(toast);
+
+  const timeoutId = setTimeout(() => {
+    removeToast(toast);
+    activeToast = null;
+  }, 3000);
+
+  activeToast = { toast, timeoutId, onConfirm: () => {} };
 }
 
 function removeToast(toast) {

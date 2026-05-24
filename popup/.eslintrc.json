@@ -22,21 +22,47 @@
       }
     },
     {
+      "files": ["tags.js"],
+      "globals": {
+        "escapeHtml": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off",
+        "require-atomic-updates": "off"
+      }
+    },
+    {
+      "files": ["export-import.js"],
+      "globals": {
+        "showInfoToast": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off",
+        "require-atomic-updates": "off"
+      }
+    },
+    {
       "files": ["popup.js"],
+      "rules": {
+        "require-atomic-updates": "off"
+      },
       "globals": {
         "AUTO_COLORS": "readonly",
-        "HEX_COLOR_PATTERN": "readonly",
         "safeColor": "readonly",
         "escapeHtml": "readonly",
         "formatAge": "readonly",
         "showUndoToast": "readonly",
-        "dismissActiveToast": "readonly",
-        "TOAST_DURATION_MS": "readonly",
         "initSearch": "readonly",
-        "getSearchQuery": "readonly",
-        "clearSearch": "readonly",
         "filterSessionList": "readonly",
-        "currentSearchQuery": "writable"
+        "getSaveTags": "readonly",
+        "resetSaveTags": "readonly",
+        "initSaveTagEvents": "readonly",
+        "openTagEditor": "readonly",
+        "initTagEditorEvents": "readonly",
+        "handleExport": "readonly",
+        "handleImport": "readonly",
+        "downloadJson": "readonly",
+        "loadStorageStats": "readonly"
       }
     }
   ]

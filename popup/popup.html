@@ -12,6 +12,13 @@
         <img src="../icons/icon-32.png" alt="" />
         <span>Session Snapshot</span>
       </div>
+      <div id="ss-header-actions">
+        <button id="ss-export-btn" title="Esporta sessioni">&#8681;</button>
+        <label id="ss-import-label" title="Importa sessioni">
+          &#8679;
+          <input id="ss-import-input" type="file" accept=".json" class="hidden" />
+        </label>
+      </div>
     </header>
 
     <div id="ss-save-section">
@@ -26,6 +33,15 @@
           maxlength="50"
         />
         <div id="ss-color-picker"></div>
+        <div id="ss-tag-input-wrapper">
+          <input
+            id="ss-tag-input"
+            type="text"
+            placeholder="Aggiungi tag e premi Invio"
+            maxlength="20"
+          />
+          <div id="ss-tag-list"></div>
+        </div>
         <div id="ss-save-actions">
           <button id="ss-save-confirm">Salva</button>
           <button id="ss-save-cancel">Annulla</button>
@@ -40,7 +56,7 @@
           <input
             id="ss-search-input"
             type="search"
-            placeholder="Cerca sessione..."
+            placeholder="Cerca per nome o tag..."
             autocomplete="off"
           />
         </div>
@@ -55,11 +71,33 @@
       </div>
     </div>
 
+    <footer id="ss-footer">
+      <span id="ss-storage-info">--</span>
+    </footer>
+
     <div id="ss-toast-container"></div>
+
+    <div id="ss-tag-editor-overlay" class="hidden">
+      <div id="ss-tag-editor">
+        <div id="ss-tag-editor-title">Gestisci tag</div>
+        <input
+          id="ss-tag-editor-input"
+          type="text"
+          placeholder="Aggiungi tag e premi Invio"
+          maxlength="20"
+        />
+        <div id="ss-tag-editor-list"></div>
+        <div id="ss-tag-editor-actions">
+          <button id="ss-tag-editor-done">Fatto</button>
+        </div>
+      </div>
+    </div>
 
     <script src="ui-utils.js"></script>
     <script src="toast.js"></script>
     <script src="search.js"></script>
+    <script src="tags.js"></script>
+    <script src="export-import.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

@@ -17,6 +17,8 @@
   --ss-hover: #f3f4f6;
   --ss-radius: 8px;
   --ss-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --ss-tag-bg: #ddf4ff;
+  --ss-tag-text: #0969da;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +33,8 @@
     --ss-danger: #ff7b72;
     --ss-danger-hover: #ffa198;
     --ss-hover: #2d3139;
+    --ss-tag-bg: #1b3a5c;
+    --ss-tag-text: #79b8ff;
   }
 }
 
@@ -73,6 +77,34 @@ body {
 #ss-logo img {
   width: 20px;
   height: 20px;
+}
+
+#ss-header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+#ss-export-btn,
+#ss-import-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--ss-border);
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--ss-text-secondary);
+  transition: background 0.15s;
+}
+
+#ss-export-btn:hover,
+#ss-import-label:hover {
+  background: var(--ss-hover);
+  color: var(--ss-text-primary);
 }
 
 /* --- Save section --- */
@@ -147,6 +179,78 @@ body {
   border-color: var(--ss-text-primary);
 }
 
+/* --- Tag input --- */
+
+#ss-tag-input-wrapper {
+  margin-bottom: 10px;
+}
+
+#ss-tag-input,
+#ss-tag-editor-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--ss-border);
+  border-radius: 6px;
+  background: var(--ss-bg);
+  color: var(--ss-text-primary);
+  font-size: 13px;
+  font-family: var(--ss-font);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#ss-tag-input:focus,
+#ss-tag-editor-input:focus {
+  border-color: var(--ss-accent);
+  box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.12);
+}
+
+#ss-tag-list,
+#ss-tag-editor-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* --- Tag pills --- */
+
+.ss-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--ss-tag-bg);
+  color: var(--ss-tag-text);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ss-tag-removable {
+  cursor: default;
+}
+
+.ss-tag-remove {
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.1s;
+}
+
+.ss-tag-remove:hover {
+  opacity: 1;
+}
+
+.ss-session-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
 /* --- Save actions --- */
 
 #ss-save-actions {
@@ -196,6 +300,9 @@ body {
 }
 
 #ss-sessions-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 10px 16px 4px;
   font-size: 12px;
   font-weight: 600;
@@ -359,12 +466,6 @@ body {
 
 /* --- Search bar --- */
 
-#ss-sessions-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 #ss-search-wrapper {
   padding: 0 16px 6px;
 }
@@ -391,9 +492,68 @@ body {
   color: var(--ss-text-secondary);
 }
 
-/* Hide browser-default search clear button for consistent look */
 #ss-search-input::-webkit-search-cancel-button {
   display: none;
+}
+
+/* --- Footer / Storage stats --- */
+
+#ss-footer {
+  padding: 6px 16px;
+  border-top: 1px solid var(--ss-border);
+  font-size: 11px;
+  color: var(--ss-text-secondary);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* --- Tag editor overlay --- */
+
+#ss-tag-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ss-tag-editor {
+  background: var(--ss-bg);
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius);
+  padding: 16px;
+  width: 300px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+#ss-tag-editor-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+#ss-tag-editor-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#ss-tag-editor-done {
+  padding: 6px 16px;
+  background: var(--ss-accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#ss-tag-editor-done:hover {
+  background: var(--ss-accent-hover);
 }
 
 /* --- Toast notifications --- */

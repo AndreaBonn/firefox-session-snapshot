@@ -1,5 +1,5 @@
 // Session Snapshot - Search/filter module
-// Provides real-time text filtering on session list.
+// Provides real-time text filtering on session list by name and tags.
 // Depends on: ui-utils.js (loaded before this file)
 
 const SEARCH_DEBOUNCE_MS = 150;
@@ -50,7 +50,13 @@ function filterSessionList() {
     if (!nameEl) return;
 
     const name = nameEl.textContent.toLowerCase();
-    const matches = !currentSearchQuery || name.includes(currentSearchQuery);
+    const tagEls = item.querySelectorAll(".ss-tag-pill");
+    const tagText = Array.from(tagEls)
+      .map((el) => el.textContent.toLowerCase())
+      .join(" ");
+
+    const searchTarget = `${name} ${tagText}`;
+    const matches = !currentSearchQuery || searchTarget.includes(currentSearchQuery);
     item.classList.toggle("hidden", !matches);
     if (matches) visibleCount++;
   });
