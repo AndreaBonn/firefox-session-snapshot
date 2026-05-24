@@ -13,7 +13,14 @@
   "permissions": ["tabs", "storage", "activeTab", "windows"],
   "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
   "background": {
-    "scripts": ["background/validation.js", "background/background.js"],
+    "scripts": [
+      "background/validation.js",
+      "background/storage.js",
+      "background/session-crud.js",
+      "background/auto-sync.js",
+      "background/export-import.js",
+      "background/background.js"
+    ],
     "persistent": false
   },
   "browser_action": {

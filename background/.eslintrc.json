@@ -7,27 +7,91 @@
       }
     },
     {
-      "files": ["background.js"],
+      "files": ["storage.js"],
+      "globals": {
+        "STORAGE_INDEX_KEY": "readonly",
+        "STORAGE_SESSION_PREFIX": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["session-crud.js"],
       "globals": {
         "STORAGE_INDEX_KEY": "readonly",
         "STORAGE_SESSION_PREFIX": "readonly",
         "STORAGE_PENDING_SCROLL_KEY": "readonly",
-        "STORAGE_TRACKED_WINDOWS_KEY": "readonly",
-        "AUTO_SYNC_DEBOUNCE_MS": "readonly",
-        "AUTO_COLORS": "readonly",
-        "EXCLUDED_URL_PREFIXES": "readonly",
-        "ALLOWED_URL_SCHEMES": "readonly",
-        "SESSION_ID_PATTERN": "readonly",
-        "HEX_COLOR_PATTERN": "readonly",
-        "MAX_SESSION_NAME_LENGTH": "readonly",
-        "MAX_SCROLL_VALUE": "readonly",
-        "isValidSessionId": "readonly",
+        "isExcludedUrl": "readonly",
+        "isAllowedUrlScheme": "readonly",
         "isValidColor": "readonly",
         "sanitizeName": "readonly",
         "sanitizeScroll": "readonly",
+        "sanitizeTags": "readonly",
+        "getAutoColor": "readonly",
+        "getIndex": "readonly",
+        "getSession": "readonly",
+        "getSessions": "readonly",
+        "deduplicateName": "readonly",
+        "trackWindow": "readonly",
+        "untrackSessionWindows": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["auto-sync.js"],
+      "globals": {
+        "STORAGE_SESSION_PREFIX": "readonly",
+        "STORAGE_TRACKED_WINDOWS_KEY": "readonly",
+        "STORAGE_PENDING_SCROLL_KEY": "readonly",
+        "AUTO_SYNC_DEBOUNCE_MS": "readonly",
+        "getSession": "readonly",
+        "buildTabsFromWindow": "readonly",
+        "isExcludedUrl": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["export-import.js"],
+      "globals": {
+        "STORAGE_INDEX_KEY": "readonly",
+        "STORAGE_SESSION_PREFIX": "readonly",
+        "isValidColor": "readonly",
         "isAllowedUrlScheme": "readonly",
-        "isExcludedUrl": "readonly",
-        "getAutoColor": "readonly"
+        "sanitizeName": "readonly",
+        "sanitizeScroll": "readonly",
+        "sanitizeTags": "readonly",
+        "getAutoColor": "readonly",
+        "getIndex": "readonly",
+        "getSession": "readonly",
+        "getSessions": "readonly",
+        "deduplicateName": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["background.js"],
+      "globals": {
+        "DEFERRED_DELETE_MS": "readonly",
+        "isValidSessionId": "readonly",
+        "saveSession": "readonly",
+        "restoreSession": "readonly",
+        "deleteSession": "readonly",
+        "renameSession": "readonly",
+        "updateSession": "readonly",
+        "updateSessionTags": "readonly",
+        "getSessions": "readonly",
+        "getTrackedWindows": "readonly",
+        "exportSessions": "readonly",
+        "exportSingleSession": "readonly",
+        "importSessions": "readonly",
+        "getStorageStats": "readonly"
       }
     }
   ]

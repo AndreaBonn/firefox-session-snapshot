@@ -1,11 +1,12 @@
 // Session Snapshot - Input validation and constants
-// Loaded before background.js via manifest background.scripts array.
+// Loaded first via manifest background.scripts array.
 
 const STORAGE_INDEX_KEY = "snapshot_index";
 const STORAGE_SESSION_PREFIX = "snapshot_";
 const STORAGE_PENDING_SCROLL_KEY = "snapshot_pending_scroll";
 const STORAGE_TRACKED_WINDOWS_KEY = "snapshot_tracked_windows";
 const AUTO_SYNC_DEBOUNCE_MS = 2000;
+const DEFERRED_DELETE_MS = 5000;
 
 const AUTO_COLORS = [
   "#0969da",
@@ -21,12 +22,17 @@ const AUTO_COLORS = [
 const EXCLUDED_URL_PREFIXES = ["about:", "moz-extension:"];
 const ALLOWED_URL_SCHEMES = ["https:", "http:", "ftp:", "file:"];
 const SESSION_ID_PATTERN = /^sess_\d+$/;
+const SESSION_ID_IMPORT_PATTERN = /^sess_\d+_[a-z0-9]+$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 const MAX_SESSION_NAME_LENGTH = 100;
 const MAX_SCROLL_VALUE = 200000;
+const MAX_TAGS_PER_SESSION = 5;
+const MAX_TAG_LENGTH = 20;
+const TAG_PATTERN = /^[a-zA-Z0-9À-ÿ][a-zA-Z0-9À-ÿ\s-]*$/;
 
 function isValidSessionId(sessionId) {
-  return typeof sessionId === "string" && SESSION_ID_PATTERN.test(sessionId);
+  if (typeof sessionId !== "string") return false;
+  return SESSION_ID_PATTERN.test(sessionId) || SESSION_ID_IMPORT_PATTERN.test(sessionId);
 }
 
 function isValidColor(color) {
@@ -59,4 +65,27 @@ function isExcludedUrl(url) {
 
 function getAutoColor(indexLength) {
   return AUTO_COLORS[indexLength % AUTO_COLORS.length];
+}
+
+function sanitizeTag(tag) {
+  if (typeof tag !== "string") return "";
+  const trimmed = tag.trim().slice(0, MAX_TAG_LENGTH).toLowerCase();
+  return TAG_PATTERN.test(trimmed) ? trimmed : "";
+}
+
+function sanitizeTags(tags) {
+  if (!Array.isArray(tags)) return [];
+  const seen = new Set();
+  const result = [];
+
+  for (const tag of tags) {
+    const clean = sanitizeTag(tag);
+    if (clean && !seen.has(clean)) {
+      seen.add(clean);
+      result.push(clean);
+    }
+    if (result.length >= MAX_TAGS_PER_SESSION) break;
+  }
+
+  return result;
 }
