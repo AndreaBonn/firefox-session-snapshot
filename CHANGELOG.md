@@ -5,6 +5,33 @@ All notable changes to Session Snapshot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-24
+
+### Added
+
+- Full bilingual support (English/Italian) with runtime language switching
+- Locale files (`_locales/en/`, `_locales/it/`) for all UI strings
+- Max 200 sessions limit with validation
+- 1-second throttle on save-session to prevent duplicate saves
+
+### Changed
+
+- Migrated from Manifest V2 to Manifest V3 (background.scripts, action, host_permissions, content_security_policy)
+- Minimum Firefox version raised from 91.0 to 109.0 (required for MV3 support)
+- Extracted shared constants and i18n helpers to `shared/` directory
+- Popup split into 5 modules (popup, tags, export-import, context-menu, inline-rename)
+
+### Fixed
+
+- Shadowed variable in session-crud arrow functions
+- Session ID collisions (added random suffix)
+- maxLength input attribute aligned to MAX_SESSION_NAME_LENGTH constant (100)
+- Silent catch in auto-sync syncTrackedWindow now logs warning
+
+### Security
+
+- Removed unused `data-i18n-html` attribute that allowed innerHTML injection
+
 ## [1.2.0] - 2026-05-24
 
 ### Added
