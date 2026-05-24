@@ -30,13 +30,16 @@ describe("search: filterSessionList", () => {
 
   function setupSessionItems() {
     const list = document.getElementById("ss-sessions-list");
-    list.innerHTML = [
+    const sessions = [
       { id: "sess_1", name: "Progetto Alpha", tabCount: 3 },
       { id: "sess_2", name: "Progetto Beta", tabCount: 5 },
       { id: "sess_3", name: "Lavoro Importante", tabCount: 2 },
-    ]
-      .map((s) => renderSession({ ...s, color: "#0969da", updatedAt: Date.now() }))
-      .join("");
+    ];
+    list.replaceChildren(
+      ...sessions.map((s) =>
+        createSessionElement({ ...s, color: "#0969da", updatedAt: Date.now() })
+      )
+    );
     list.classList.remove("hidden");
   }
 

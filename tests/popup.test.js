@@ -74,9 +74,9 @@ describe("popup: escapeHtml", () => {
   });
 });
 
-describe("popup: renderSession", () => {
+describe("popup: createSessionElement", () => {
   test("renders session item with correct data attributes", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: "Progetto A",
       color: "#0969da",
@@ -84,27 +84,28 @@ describe("popup: renderSession", () => {
       updatedAt: Date.now(),
     });
 
-    expect(html).toContain('data-id="sess_100"');
-    expect(html).toContain("Progetto A");
-    expect(html).toContain("4 schede");
-    expect(html).toContain('data-color="#0969da"');
+    expect(el.dataset.id).toBe("sess_100");
+    expect(el.textContent).toContain("Progetto A");
+    expect(el.textContent).toContain("4 schede");
+    expect(el.querySelector('[data-color="#0969da"]')).not.toBeNull();
   });
 
   test("escapes session name in rendered HTML", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: '<img onerror="alert(1)">',
       color: "#000",
       tabCount: 1,
       updatedAt: Date.now(),
     });
+    const html = el.outerHTML;
 
     expect(html).not.toContain("<img");
     expect(html).toContain("&lt;img");
   });
 
   test("includes restore and menu buttons with session ID", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_42",
       name: "Test",
       color: "#000",
@@ -112,15 +113,15 @@ describe("popup: renderSession", () => {
       updatedAt: Date.now(),
     });
 
-    expect(html).toContain('class="ss-restore-btn"');
-    expect(html).toContain('class="ss-menu-btn"');
-    expect(html).toContain('data-id="sess_42"');
+    expect(el.querySelector(".ss-restore-btn")).not.toBeNull();
+    expect(el.querySelector(".ss-menu-btn")).not.toBeNull();
+    expect(el.querySelector('[data-id="sess_42"]')).not.toBeNull();
   });
 });
 
-describe("popup: renderSession with tags", () => {
+describe("popup: createSessionElement with tags", () => {
   test("renders tag pills when session has tags", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: "Tagged",
       color: "#0969da",
@@ -129,13 +130,13 @@ describe("popup: renderSession with tags", () => {
       tags: ["work", "urgent"],
     });
 
-    expect(html).toContain("ss-tag-pill");
-    expect(html).toContain("work");
-    expect(html).toContain("urgent");
+    expect(el.querySelectorAll(".ss-tag-pill")).toHaveLength(2);
+    expect(el.textContent).toContain("work");
+    expect(el.textContent).toContain("urgent");
   });
 
   test("renders without tag section when no tags", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: "No Tags",
       color: "#0969da",
@@ -144,11 +145,11 @@ describe("popup: renderSession with tags", () => {
       tags: [],
     });
 
-    expect(html).not.toContain("ss-session-tags");
+    expect(el.querySelector(".ss-session-tags")).toBeNull();
   });
 
   test("renders without tag section when tags undefined", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: "Legacy",
       color: "#0969da",
@@ -156,11 +157,11 @@ describe("popup: renderSession with tags", () => {
       updatedAt: Date.now(),
     });
 
-    expect(html).not.toContain("ss-session-tags");
+    expect(el.querySelector(".ss-session-tags")).toBeNull();
   });
 
   test("escapes tag content in HTML", () => {
-    const html = renderSession({
+    const el = createSessionElement({
       id: "sess_100",
       name: "Test",
       color: "#0969da",
@@ -168,15 +169,17 @@ describe("popup: renderSession with tags", () => {
       updatedAt: Date.now(),
       tags: ["<script>"],
     });
+    const html = el.outerHTML;
 
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;script&gt;");
   });
 });
 
-describe("popup: renderContextMenu", () => {
+describe("popup: createContextMenu", () => {
   test("renders menu with all actions", () => {
-    const html = renderContextMenu("sess_100");
+    const menu = createContextMenu("sess_100");
+    const html = menu.outerHTML;
 
     expect(html).toContain('data-action="update"');
     expect(html).toContain('data-action="rename"');
@@ -187,7 +190,8 @@ describe("popup: renderContextMenu", () => {
   });
 
   test("delete button has danger class", () => {
-    const html = renderContextMenu("sess_100");
+    const menu = createContextMenu("sess_100");
+    const html = menu.outerHTML;
     expect(html).toContain("ss-danger");
   });
 });
