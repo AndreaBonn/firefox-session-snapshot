@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Session Snapshot",
   "version": "1.2.0",
   "default_locale": "it",
@@ -11,8 +11,11 @@
     "96": "icons/icon-96.png",
     "128": "icons/icon-128.png"
   },
-  "permissions": ["tabs", "storage", "activeTab", "windows"],
-  "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
+  "permissions": ["tabs", "storage", "activeTab"],
+  "host_permissions": [],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; style-src 'self'; object-src 'self';"
+  },
   "background": {
     "scripts": [
       "shared/constants.js",
@@ -24,10 +27,9 @@
       "background/auto-sync.js",
       "background/export-import.js",
       "background/background.js"
-    ],
-    "persistent": false
+    ]
   },
-  "browser_action": {
+  "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -62,7 +64,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "session-snapshot@andreabonacci95.protonmail.com",
-      "strict_min_version": "91.0"
+      "strict_min_version": "109.0"
     }
   }
 }
