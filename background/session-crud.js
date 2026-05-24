@@ -52,7 +52,7 @@ async function saveSession(name, color, tags) {
   );
 
   const now = Date.now();
-  const id = `sess_${now}`;
+  const id = `sess_${now}_${Math.random().toString(36).slice(2, 8)}`;
   const index = await getIndex();
 
   const locale = i18nGetLang() === "en" ? "en-US" : "it-IT";

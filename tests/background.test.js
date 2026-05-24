@@ -238,7 +238,7 @@ describe("background: saveSession", () => {
     expect(result.session.color).toBe("#0969da");
     expect(result.session.tabs).toHaveLength(2);
     expect(result.session.tabCount).toBe(2);
-    expect(result.session.id).toMatch(/^sess_\d+$/);
+    expect(result.session.id).toMatch(/^sess_\d+_[a-z0-9]+$/);
     expect(result.session.createdAt).toBeDefined();
     expect(result.session.updatedAt).toBe(result.session.createdAt);
   });
