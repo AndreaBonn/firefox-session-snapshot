@@ -1,67 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Session Snapshot</title>
-  <link rel="stylesheet" href="popup.css">
-</head>
-<body>
-  <header id="ss-header">
-    <div id="ss-logo">
-      <img src="../icons/icon-32.png" alt="" />
-      <span>Session Snapshot</span>
-    </div>
-  </header>
-
-  <div id="ss-save-section">
-    <div id="ss-save-collapsed">
-      <button id="ss-save-btn">
-        <span>+</span> Salva sessione corrente
-      </button>
-    </div>
-    <div id="ss-save-expanded" class="hidden">
-      <input
-        id="ss-session-name"
-        type="text"
-        placeholder="Nome sessione (es. Progetto A)"
-        maxlength="50"
-      />
-      <div id="ss-color-picker"></div>
-      <div id="ss-save-actions">
-        <button id="ss-save-confirm">Salva</button>
-        <button id="ss-save-cancel">Annulla</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Session Snapshot</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header id="ss-header">
+      <div id="ss-logo">
+        <img src="../icons/icon-32.png" alt="" />
+        <span>Session Snapshot</span>
       </div>
-    </div>
-  </div>
+    </header>
 
-  <div id="ss-sessions-section">
-    <div id="ss-sessions-header">
-      <span id="ss-sessions-count">Le tue sessioni</span>
-      <div id="ss-search-wrapper">
+    <div id="ss-save-section">
+      <div id="ss-save-collapsed">
+        <button id="ss-save-btn"><span>+</span> Salva sessione corrente</button>
+      </div>
+      <div id="ss-save-expanded" class="hidden">
         <input
-          id="ss-search-input"
-          type="search"
-          placeholder="Cerca sessione..."
-          autocomplete="off"
+          id="ss-session-name"
+          type="text"
+          placeholder="Nome sessione (es. Progetto A)"
+          maxlength="50"
         />
+        <div id="ss-color-picker"></div>
+        <div id="ss-save-actions">
+          <button id="ss-save-confirm">Salva</button>
+          <button id="ss-save-cancel">Annulla</button>
+        </div>
       </div>
     </div>
-    <div id="ss-sessions-list"></div>
-    <div id="ss-empty-state" class="hidden">
-      <p>Nessuna sessione salvata.</p>
-      <p>Clicca "+ Salva sessione corrente" per iniziare.</p>
-    </div>
-    <div id="ss-no-results" class="hidden">
-      <p>Nessuna sessione trovata.</p>
-    </div>
-  </div>
 
-  <div id="ss-toast-container"></div>
+    <div id="ss-sessions-section">
+      <div id="ss-sessions-header">
+        <span id="ss-sessions-count">Le tue sessioni</span>
+        <div id="ss-search-wrapper">
+          <input
+            id="ss-search-input"
+            type="search"
+            placeholder="Cerca sessione..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      <div id="ss-sessions-list"></div>
+      <div id="ss-empty-state" class="hidden">
+        <p>Nessuna sessione salvata.</p>
+        <p>Clicca "+ Salva sessione corrente" per iniziare.</p>
+      </div>
+      <div id="ss-no-results" class="hidden">
+        <p>Nessuna sessione trovata.</p>
+      </div>
+    </div>
 
-  <script src="ui-utils.js"></script>
-  <script src="toast.js"></script>
-  <script src="search.js"></script>
-  <script src="popup.js"></script>
-</body>
+    <div id="ss-toast-container"></div>
+
+    <script src="ui-utils.js"></script>
+    <script src="toast.js"></script>
+    <script src="search.js"></script>
+    <script src="popup.js"></script>
+  </body>
 </html>

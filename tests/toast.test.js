@@ -2,10 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { loadScript } = require("./helpers");
 
-const popupHtml = fs.readFileSync(
-  path.resolve(__dirname, "../popup/popup.html"),
-  "utf-8"
-);
+const popupHtml = fs.readFileSync(path.resolve(__dirname, "../popup/popup.html"), "utf-8");
 
 describe("toast: showUndoToast", () => {
   beforeAll(() => {

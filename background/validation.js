@@ -8,8 +8,14 @@ const STORAGE_TRACKED_WINDOWS_KEY = "snapshot_tracked_windows";
 const AUTO_SYNC_DEBOUNCE_MS = 2000;
 
 const AUTO_COLORS = [
-  "#0969da", "#1a7f37", "#9a3412", "#6e40c9",
-  "#b45309", "#0e7490", "#be185d", "#374151",
+  "#0969da",
+  "#1a7f37",
+  "#9a3412",
+  "#6e40c9",
+  "#b45309",
+  "#0e7490",
+  "#be185d",
+  "#374151",
 ];
 
 const EXCLUDED_URL_PREFIXES = ["about:", "moz-extension:"];

@@ -2,10 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { loadScript } = require("./helpers");
 
-const popupHtml = fs.readFileSync(
-  path.resolve(__dirname, "../popup/popup.html"),
-  "utf-8"
-);
+const popupHtml = fs.readFileSync(path.resolve(__dirname, "../popup/popup.html"), "utf-8");
 
 describe("search: filterSessionList", () => {
   beforeAll(() => {
@@ -34,7 +31,9 @@ describe("search: filterSessionList", () => {
       { id: "sess_1", name: "Progetto Alpha", tabCount: 3 },
       { id: "sess_2", name: "Progetto Beta", tabCount: 5 },
       { id: "sess_3", name: "Lavoro Importante", tabCount: 2 },
-    ].map((s) => renderSession({ ...s, color: "#0969da", updatedAt: Date.now() })).join("");
+    ]
+      .map((s) => renderSession({ ...s, color: "#0969da", updatedAt: Date.now() }))
+      .join("");
     list.classList.remove("hidden");
   }
 

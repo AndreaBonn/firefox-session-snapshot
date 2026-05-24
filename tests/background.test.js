@@ -204,14 +204,22 @@ describe("background: saveSession", () => {
       id: 1,
       tabs: [
         {
-          id: 101, index: 0, url: "https://example.com",
-          title: "Example", favIconUrl: "https://example.com/fav.ico",
-          active: true, pinned: false,
+          id: 101,
+          index: 0,
+          url: "https://example.com",
+          title: "Example",
+          favIconUrl: "https://example.com/fav.ico",
+          active: true,
+          pinned: false,
         },
         {
-          id: 102, index: 1, url: "https://github.com",
-          title: "GitHub", favIconUrl: null,
-          active: false, pinned: true,
+          id: 102,
+          index: 1,
+          url: "https://github.com",
+          title: "GitHub",
+          favIconUrl: null,
+          active: false,
+          pinned: true,
         },
       ],
     });
@@ -255,7 +263,14 @@ describe("background: saveSession", () => {
       tabs: [
         { id: 101, index: 0, url: "https://example.com", title: "Ex", active: true, pinned: false },
         { id: 102, index: 1, url: "about:newtab", title: "New Tab", active: false, pinned: false },
-        { id: 103, index: 2, url: "moz-extension://abc/popup.html", title: "Ext", active: false, pinned: false },
+        {
+          id: 103,
+          index: 2,
+          url: "moz-extension://abc/popup.html",
+          title: "Ext",
+          active: false,
+          pinned: false,
+        },
       ],
     });
 
@@ -413,8 +428,13 @@ describe("background: updateSession", () => {
       id: 5,
       tabs: [
         {
-          id: 301, index: 0, url: "https://new-url.com",
-          title: "New", favIconUrl: null, active: true, pinned: false,
+          id: 301,
+          index: 0,
+          url: "https://new-url.com",
+          title: "New",
+          favIconUrl: null,
+          active: true,
+          pinned: false,
         },
       ],
     });
@@ -472,8 +492,22 @@ describe("background: restoreSession", () => {
         id: "sess_100",
         name: "Test",
         tabs: [
-          { index: 0, url: "https://pinned.com", pinned: true, active: false, scrollX: 0, scrollY: 0 },
-          { index: 1, url: "https://normal.com", pinned: false, active: true, scrollX: 0, scrollY: 0 },
+          {
+            index: 0,
+            url: "https://pinned.com",
+            pinned: true,
+            active: false,
+            scrollX: 0,
+            scrollY: 0,
+          },
+          {
+            index: 1,
+            url: "https://normal.com",
+            pinned: false,
+            active: true,
+            scrollX: 0,
+            scrollY: 0,
+          },
         ],
       },
     });
@@ -494,9 +528,30 @@ describe("background: restoreSession", () => {
         id: "sess_100",
         name: "Test",
         tabs: [
-          { index: 0, url: "https://first.com", pinned: false, active: true, scrollX: 0, scrollY: 0 },
-          { index: 1, url: "https://second.com", pinned: false, active: false, scrollX: 0, scrollY: 0 },
-          { index: 2, url: "https://third.com", pinned: true, active: false, scrollX: 0, scrollY: 0 },
+          {
+            index: 0,
+            url: "https://first.com",
+            pinned: false,
+            active: true,
+            scrollX: 0,
+            scrollY: 0,
+          },
+          {
+            index: 1,
+            url: "https://second.com",
+            pinned: false,
+            active: false,
+            scrollX: 0,
+            scrollY: 0,
+          },
+          {
+            index: 2,
+            url: "https://third.com",
+            pinned: true,
+            active: false,
+            scrollX: 0,
+            scrollY: 0,
+          },
         ],
       },
     });
@@ -661,7 +716,14 @@ describe("background: syncTrackedWindow", () => {
       id: 42,
       tabs: [
         { id: 301, index: 0, url: "https://new.com", title: "New", active: true, pinned: false },
-        { id: 302, index: 1, url: "https://another.com", title: "Another", active: false, pinned: false },
+        {
+          id: 302,
+          index: 1,
+          url: "https://another.com",
+          title: "Another",
+          active: false,
+          pinned: false,
+        },
       ],
     });
 
@@ -718,7 +780,14 @@ describe("background: syncTrackedWindow", () => {
     browser.windows.get.mockResolvedValue({
       id: 42,
       tabs: [
-        { id: 301, index: 0, url: "https://valid.com", title: "Valid", active: true, pinned: false },
+        {
+          id: 301,
+          index: 0,
+          url: "https://valid.com",
+          title: "Valid",
+          active: true,
+          pinned: false,
+        },
         { id: 302, index: 1, url: "about:newtab", title: "New Tab", active: false, pinned: false },
       ],
     });

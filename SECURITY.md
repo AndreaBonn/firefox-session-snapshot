@@ -9,12 +9,14 @@ This project is in active development. Security updates are applied to the lates
 To report a security vulnerability, use [GitHub Security Advisories](https://github.com/AndreaBonn/firefox-session-snapshot/security/advisories/new).
 
 Please include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Expected vs actual behavior
 - Impact assessment (what an attacker could achieve)
 
 **Response timeline:**
+
 - Acknowledgment: within 72 hours
 - Fix for critical issues: within 30 days
 - Coordinated public disclosure after the fix is released

@@ -21,9 +21,7 @@ async function getSessions() {
 
   const keys = index.map((id) => `${STORAGE_SESSION_PREFIX}${id}`);
   const data = await browser.storage.local.get(keys);
-  const sessions = index
-    .map((id) => data[`${STORAGE_SESSION_PREFIX}${id}`])
-    .filter(Boolean);
+  const sessions = index.map((id) => data[`${STORAGE_SESSION_PREFIX}${id}`]).filter(Boolean);
 
   return { sessions };
 }
@@ -32,9 +30,7 @@ async function getSessions() {
 
 async function deduplicateName(name, excludeId) {
   const { sessions } = await getSessions();
-  const existingNames = sessions
-    .filter((s) => s.id !== excludeId)
-    .map((s) => s.name);
+  const existingNames = sessions.filter((s) => s.id !== excludeId).map((s) => s.name);
 
   if (!existingNames.includes(name)) return name;
 
@@ -62,16 +58,18 @@ async function captureTabScroll(tabId) {
 
 async function buildTabsFromWindow(windowId) {
   const currentWindow = await browser.windows.get(windowId, { populate: true });
-  return currentWindow.tabs.filter((tab) => !isExcludedUrl(tab.url)).map((tab) => ({
-    index: tab.index,
-    url: tab.url,
-    title: tab.title,
-    favIconUrl: tab.favIconUrl || null,
-    active: tab.active,
-    pinned: tab.pinned,
-    scrollX: 0,
-    scrollY: 0,
-  }));
+  return currentWindow.tabs
+    .filter((tab) => !isExcludedUrl(tab.url))
+    .map((tab) => ({
+      index: tab.index,
+      url: tab.url,
+      title: tab.title,
+      favIconUrl: tab.favIconUrl || null,
+      active: tab.active,
+      pinned: tab.pinned,
+      scrollX: 0,
+      scrollY: 0,
+    }));
 }
 
 // --- Core: save session ---
@@ -421,17 +419,18 @@ async function restorePendingScroll(tabId) {
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const isFromContentScript = Boolean(sender.tab);
   const mutationActions = [
-    "save-session", "restore-session", "delete-session",
-    "rename-session", "update-session",
+    "save-session",
+    "restore-session",
+    "delete-session",
+    "rename-session",
+    "update-session",
   ];
 
   if (isFromContentScript && mutationActions.includes(message.action)) {
     return false;
   }
 
-  const needsSessionId = [
-    "restore-session", "delete-session", "rename-session", "update-session",
-  ];
+  const needsSessionId = ["restore-session", "delete-session", "rename-session", "update-session"];
   if (needsSessionId.includes(message.action) && !isValidSessionId(message.sessionId)) {
     sendResponse({ success: false, error: "ID sessione non valido" });
     return true;

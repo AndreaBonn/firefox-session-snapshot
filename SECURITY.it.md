@@ -9,12 +9,14 @@ Questo progetto e in sviluppo attivo. Gli aggiornamenti di sicurezza vengono app
 Per segnalare una vulnerabilita di sicurezza, usa [GitHub Security Advisories](https://github.com/AndreaBonn/firefox-session-snapshot/security/advisories/new).
 
 Includi:
+
 - Descrizione della vulnerabilita
 - Passaggi per riprodurla
 - Comportamento atteso vs comportamento effettivo
 - Valutazione dell'impatto (cosa potrebbe ottenere un attaccante)
 
 **Tempi di risposta:**
+
 - Presa in carico: entro 72 ore
 - Fix per problemi critici: entro 30 giorni
 - Disclosure pubblica coordinata dopo il rilascio del fix

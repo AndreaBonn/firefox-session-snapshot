@@ -49,11 +49,7 @@ describe("scroll-capture: content script", () => {
 
   test("restore-scroll calls window.scrollTo after delay", () => {
     const sendResponse = jest.fn();
-    messageHandler(
-      { action: "restore-scroll", x: 50, y: 800 },
-      {},
-      sendResponse
-    );
+    messageHandler({ action: "restore-scroll", x: 50, y: 800 }, {}, sendResponse);
 
     expect(sendResponse).toHaveBeenCalledWith({ success: true });
     expect(window.scrollTo).not.toHaveBeenCalled();
@@ -69,11 +65,7 @@ describe("scroll-capture: content script", () => {
 
   test("restore-scroll uses instant behavior, not smooth", () => {
     const sendResponse = jest.fn();
-    messageHandler(
-      { action: "restore-scroll", x: 0, y: 100 },
-      {},
-      sendResponse
-    );
+    messageHandler({ action: "restore-scroll", x: 0, y: 100 }, {}, sendResponse);
 
     jest.advanceTimersByTime(300);
 

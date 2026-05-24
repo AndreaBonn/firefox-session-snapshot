@@ -9,12 +9,7 @@
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
   },
-  "permissions": [
-    "tabs",
-    "storage",
-    "activeTab",
-    "windows"
-  ],
+  "permissions": ["tabs", "storage", "activeTab", "windows"],
   "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
   "background": {
     "scripts": ["background/validation.js", "background/background.js"],

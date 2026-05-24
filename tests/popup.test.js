@@ -3,10 +3,7 @@ const path = require("path");
 const { loadScript } = require("./helpers");
 
 // Load popup HTML into jsdom before loading popup.js
-const popupHtml = fs.readFileSync(
-  path.resolve(__dirname, "../popup/popup.html"),
-  "utf-8"
-);
+const popupHtml = fs.readFileSync(path.resolve(__dirname, "../popup/popup.html"), "utf-8");
 
 describe("popup: formatAge", () => {
   beforeAll(() => {
@@ -194,9 +191,7 @@ describe("popup: DOM interactions", () => {
     const list = document.getElementById("ss-sessions-list");
     expect(empty.classList.contains("hidden")).toBe(false);
     expect(list.classList.contains("hidden")).toBe(true);
-    expect(document.getElementById("ss-sessions-count").textContent).toBe(
-      "Nessuna sessione"
-    );
+    expect(document.getElementById("ss-sessions-count").textContent).toBe("Nessuna sessione");
   });
 
   test("loadSessions renders session list", async () => {
@@ -222,8 +217,6 @@ describe("popup: DOM interactions", () => {
 
     const items = document.querySelectorAll(".ss-session-item");
     expect(items).toHaveLength(2);
-    expect(document.getElementById("ss-sessions-count").textContent).toBe(
-      "Le tue sessioni (2)"
-    );
+    expect(document.getElementById("ss-sessions-count").textContent).toBe("Le tue sessioni (2)");
   });
 });

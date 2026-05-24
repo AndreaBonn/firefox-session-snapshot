@@ -76,8 +76,9 @@ function renderSession(session) {
 
 function renderColorPicker() {
   const picker = document.getElementById("ss-color-picker");
-  picker.innerHTML = AUTO_COLORS.map((color, i) =>
-    `<div class="ss-color-dot${i === 0 ? " selected" : ""}"
+  picker.innerHTML = AUTO_COLORS.map(
+    (color, i) =>
+      `<div class="ss-color-dot${i === 0 ? " selected" : ""}"
           data-color="${color}"
           title="${color}"></div>`
   ).join("");
@@ -328,4 +329,3 @@ function startInlineRename(sessionId) {
 
   input.addEventListener("blur", confirmRename);
 }
-
