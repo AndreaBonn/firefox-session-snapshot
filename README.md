@@ -10,7 +10,7 @@ A Firefox extension that saves and restores browser working sessions. Each sessi
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
-![Version](https://img.shields.io/badge/version-1.1.0-green)
+![Version](https://img.shields.io/badge/version-1.2.0-green)
 
 |                         Light                          |                         Dark                         |
 | :----------------------------------------------------: | :--------------------------------------------------: |
@@ -21,9 +21,13 @@ A Firefox extension that saves and restores browser working sessions. Each sessi
 - Save all tabs from the current window as a named, color-coded session
 - Restore sessions in a separate window with scroll position preserved
 - Auto-sync: restored windows track tab changes (add, remove, navigate) and update the session automatically
-- Search and filter saved sessions by name
+- Tag sessions with labels for organization, searchable from the filter bar
+- Export all sessions (or a single one) as JSON for backup and migration
+- Import sessions from a JSON file with validation and duplicate name handling
+- Search and filter saved sessions by name or tag
 - Inline rename with automatic duplicate handling
-- Undo support on destructive actions (delete) via toast notification
+- Undo support on destructive actions (delete) via toast notification - works even if the popup is closed
+- Storage usage indicator in the popup footer
 - Dark and light theme following system preference
 - Keyboard shortcuts: Ctrl+Shift+S (quick save), Ctrl+Shift+W (open popup)
 
@@ -88,22 +92,28 @@ sequenceDiagram
 
 ```text
 .
-├── background/            # Session logic, storage, auto-sync, validation
-│   ├── background.js      # Core CRUD, message handler, window tracking
-│   └── validation.js      # Constants, input sanitization, URL filtering
+├── background/              # Session logic (modular)
+│   ├── validation.js        # Constants, input sanitization, URL and tag validation
+│   ├── storage.js           # Low-level storage read/write helpers
+│   ├── session-crud.js      # Save, restore, delete, rename, update, tags
+│   ├── auto-sync.js         # Tracked window sync, scroll restore, event listeners
+│   ├── export-import.js     # JSON export/import with validation, storage stats
+│   └── background.js        # Message listener, deferred delete, keyboard shortcuts
 ├── content/
-│   └── scroll-capture.js  # Scroll position get/restore via messages
-├── popup/                 # Extension popup UI
-│   ├── popup.html         # Popup markup
-│   ├── popup.js           # Session list rendering, forms, context menu
-│   ├── popup.css          # Light/dark theme styles
-│   ├── search.js          # Real-time session filtering
-│   ├── toast.js           # Undo-capable toast notifications
-│   └── ui-utils.js        # Shared helpers (escapeHtml, formatAge, colors)
-├── icons/                 # Extension icons (16/32/48/96px)
-├── tests/                 # Jest unit tests (jsdom)
-├── manifest.json          # Extension manifest (Manifest V2)
-└── package.json           # Dev dependencies and scripts
+│   └── scroll-capture.js    # Scroll position get/restore via messages
+├── popup/                   # Extension popup UI
+│   ├── popup.html           # Popup markup
+│   ├── popup.js             # Session list, save form, context menu, inline rename
+│   ├── popup.css            # Light/dark theme styles
+│   ├── tags.js              # Tag input, tag editor modal
+│   ├── export-import.js     # Export/import UI, storage stats display
+│   ├── search.js            # Real-time session filtering by name and tags
+│   ├── toast.js             # Toast notifications (undo and informational)
+│   └── ui-utils.js          # Shared helpers (escapeHtml, formatAge, colors)
+├── icons/                   # Extension icons (16/32/48/96/128px)
+├── tests/                   # Jest unit tests (jsdom)
+├── manifest.json            # Extension manifest (Manifest V2)
+└── package.json             # Dev dependencies and scripts
 ```
 
 ## Prerequisites

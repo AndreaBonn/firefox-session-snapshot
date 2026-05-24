@@ -21,13 +21,13 @@ session-snapshot
 ### Sommario (max 250 caratteri)
 
 ```
-Save and restore browser sessions by project. Each session remembers your tabs and scroll positions, and auto-syncs changes in restored windows.
+Save and restore browser sessions by project. Each session remembers tabs, scroll positions, and tags. Export/import for backup. Auto-syncs changes in restored windows.
 ```
 
 ### Sommario IT (se listing multilingua)
 
 ```
-Salva e ripristina sessioni del browser per progetto. Ogni sessione ricorda schede e posizione di scroll, e sincronizza automaticamente le modifiche.
+Salva e ripristina sessioni del browser per progetto. Ogni sessione ricorda schede, scroll e tag. Export/import per backup. Sincronizza automaticamente le modifiche.
 ```
 
 ---
@@ -44,23 +44,31 @@ FEATURES
 - Save all tabs from the current window as a named, color-coded session
 - Restore sessions in a separate window with scroll positions intact
 - Auto-sync: restored windows track tab changes (open, close, navigate) and update the session automatically
-- Search and filter your saved sessions by name
+- Tag sessions with labels for organization, searchable from the filter bar
+- Export all sessions (or a single one) as JSON for backup and migration
+- Import sessions from a JSON file with validation and duplicate name handling
+- Search and filter saved sessions by name or tag
 - Inline rename with automatic duplicate handling
-- Undo on delete via toast notification
+- Undo on delete via toast notification - works even if the popup is closed
+- Storage usage indicator in the popup footer
 - Light and dark theme following your system preference
 - Keyboard shortcuts: Ctrl+Shift+S (quick save), Ctrl+Shift+W (open popup)
 
 HOW IT WORKS
 
 1. Click the Session Snapshot icon or press Ctrl+Shift+W
-2. Click "Save current session" and give it a name
+2. Click "Save current session", give it a name, choose a color and add tags
 3. Your tabs and their scroll positions are saved locally
 4. Click "Restore" on any session to open it in a new window
 5. Changes in the restored window are tracked and saved automatically
 
+EXPORT / IMPORT
+
+Use the arrow buttons in the header to export all sessions as a JSON file or import from a previously exported file. You can also export a single session from its context menu. This is useful for backups, migrating between Firefox profiles, or sharing session setups.
+
 PRIVACY
 
-All data stays on your device. No servers, no analytics, no tracking. The extension uses browser.storage.local exclusively. See the full privacy policy in the repository.
+All data stays on your device. No servers, no analytics, no tracking. The extension uses browser.storage.local exclusively. Export/import works with local files only. See the full privacy policy in the repository.
 
 PERMISSIONS
 
@@ -81,23 +89,31 @@ FUNZIONALITA
 - Salva tutte le schede della finestra corrente come sessione con nome e colore
 - Ripristina sessioni in una finestra separata con posizioni di scroll intatte
 - Auto-sync: le finestre ripristinate tracciano le modifiche (apertura, chiusura, navigazione) e aggiornano la sessione automaticamente
-- Cerca e filtra le sessioni salvate per nome
+- Etichetta le sessioni con tag per organizzarle, cercabili dalla barra di filtro
+- Esporta tutte le sessioni (o una singola) come JSON per backup e migrazione
+- Importa sessioni da file JSON con validazione e gestione nomi duplicati
+- Cerca e filtra le sessioni salvate per nome o tag
 - Rinomina inline con gestione automatica dei duplicati
-- Annulla eliminazione tramite notifica toast
+- Annulla eliminazione tramite notifica toast - funziona anche se il popup viene chiuso
+- Indicatore spazio storage nel footer del popup
 - Tema chiaro e scuro che segue le preferenze di sistema
 - Scorciatoie da tastiera: Ctrl+Shift+S (salvataggio rapido), Ctrl+Shift+W (apri popup)
 
 COME FUNZIONA
 
 1. Clicca l'icona Session Snapshot o premi Ctrl+Shift+W
-2. Clicca "Salva sessione corrente" e assegna un nome
+2. Clicca "Salva sessione corrente", assegna un nome, scegli un colore e aggiungi tag
 3. Le schede e le posizioni di scroll vengono salvate localmente
 4. Clicca "Ripristina" su qualsiasi sessione per aprirla in una nuova finestra
 5. Le modifiche nella finestra ripristinata vengono tracciate e salvate automaticamente
 
+ESPORTA / IMPORTA
+
+Usa i pulsanti freccia nell'header per esportare tutte le sessioni come file JSON o importare da un file esportato in precedenza. Puoi anche esportare una singola sessione dal menu contestuale. Utile per backup, migrazione tra profili Firefox o condivisione di configurazioni.
+
 PRIVACY
 
-Tutti i dati restano sul tuo dispositivo. Nessun server, nessuna analisi, nessun tracciamento. L'estensione usa esclusivamente browser.storage.local. La privacy policy completa e disponibile nel repository.
+Tutti i dati restano sul tuo dispositivo. Nessun server, nessuna analisi, nessun tracciamento. L'estensione usa esclusivamente browser.storage.local. Export/import funziona solo con file locali. La privacy policy completa e disponibile nel repository.
 
 PERMESSI
 
@@ -122,7 +138,7 @@ Categoria secondaria: Session Manager (se disponibile)
 ## 4. Tag (max 20)
 
 ```
-tabs, session, session-manager, save-tabs, restore-tabs, scroll-position, tab-groups, productivity, workspace, auto-sync, dark-theme, keyboard-shortcuts, tab-manager, session-restore, bookmark-alternative
+tabs, session, session-manager, save-tabs, restore-tabs, scroll-position, tab-groups, productivity, workspace, auto-sync, dark-theme, keyboard-shortcuts, tab-manager, session-restore, export, import, backup, tags, labels
 ```
 
 ---
@@ -141,9 +157,12 @@ File gia presenti in `docs/assets/`:
 
 Considera di aggiungere:
 
-- Screenshot del context menu (rename/delete/color)
+- Screenshot con tag visibili sulle sessioni
+- Screenshot del tag editor modale
+- Screenshot dei bottoni export/import nell'header
+- Screenshot del footer con indicatore storage
+- Screenshot del context menu (rename/delete/export/tags)
 - Screenshot della ricerca sessioni con risultati filtrati
-- Screenshot del toast con undo
 - GIF/video breve del flusso save-restore completo
 
 ---
@@ -191,7 +210,7 @@ https://github.com/AndreaBonn/firefox-session-snapshot/blob/main/PRIVACY_POLICY.
 ### Versione
 
 ```
-1.1.0
+1.2.0
 ```
 
 ### Versione minima Firefox
@@ -230,10 +249,22 @@ PERMISSIONS JUSTIFICATION:
 - "windows": Required to create new windows when restoring sessions and to track restored windows for auto-sync.
 - "<all_urls>" (content script): The content script (content/scroll-capture.js, 26 lines) only reads and restores scroll positions (window.scrollX/Y) on demand via message passing. It does not modify page content, access DOM elements, or make network requests.
 
+ARCHITECTURE:
+The background logic is split into 6 focused modules loaded via manifest background.scripts array (no bundler):
+- validation.js: constants and input sanitization
+- storage.js: low-level storage helpers
+- session-crud.js: save, restore, delete, rename, update, tags
+- auto-sync.js: tracked window sync and scroll restore
+- export-import.js: JSON export/import with validation, storage stats
+- background.js: message listener, deferred delete, keyboard shortcuts
+
+EXPORT/IMPORT:
+Sessions can be exported as JSON and imported from JSON files. All operations are local (file download / file picker). Import validates structure, regenerates IDs, sanitizes all fields, and filters disallowed URL schemes.
+
 SOURCE CODE: https://github.com/AndreaBonn/firefox-session-snapshot
 All source is unminified and readable. No build step required.
 
-TEST SUITE: npm test (Jest, 85%+ coverage)
+TEST SUITE: npm test (Jest, 154 tests)
 ```
 
 ---
@@ -241,10 +272,10 @@ TEST SUITE: npm test (Jest, 85%+ coverage)
 ## 10. Checklist pre-submission
 
 - [ ] Icona 128x128px (attualmente 96x96, da verificare se sufficiente)
-- [ ] Screenshot aggiornati e con didascalie
-- [ ] Privacy policy pubblicata su GitHub (PRIVACY_POLICY.md)
-- [ ] CHANGELOG.md aggiornato
-- [ ] Versione manifest.json allineata con AMO listing
+- [ ] Screenshot aggiornati con nuove feature (tag, export/import, storage indicator)
+- [ ] Privacy policy aggiornata e pubblicata su GitHub (PRIVACY_POLICY.md)
+- [ ] CHANGELOG.md aggiornato con v1.2.0
+- [ ] Versione manifest.json allineata con AMO listing (1.2.0)
 - [ ] gecko.id nel manifest (`session-snapshot@andreabonacci95.protonmail.com`) - formato email OK
 - [ ] Testare con `web-ext lint` per validazione automatica
 - [ ] Creare pacchetto .zip (escludere: node_modules, tests, .git, docs, badges, .github)
@@ -256,14 +287,14 @@ TEST SUITE: npm test (Jest, 85%+ coverage)
 
 ```bash
 # Dalla root del progetto
-zip -r session-snapshot-1.1.0.zip \
+zip -r session-snapshot-1.2.0.zip \
   manifest.json \
   background/ \
   content/ \
   popup/ \
   icons/ \
   LICENSE \
-  -x "*.DS_Store"
+  -x "*.DS_Store" "**/.eslintrc.json"
 ```
 
 Oppure con web-ext (raccomandato):

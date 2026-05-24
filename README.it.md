@@ -10,7 +10,7 @@ Un'estensione Firefox per salvare e ripristinare sessioni di lavoro nel browser.
 ![Licenza: Apache 2.0](https://img.shields.io/badge/licenza-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
-![Versione](https://img.shields.io/badge/versione-1.1.0-green)
+![Versione](https://img.shields.io/badge/versione-1.2.0-green)
 
 |                      Tema chiaro                       |                      Tema scuro                      |
 | :----------------------------------------------------: | :--------------------------------------------------: |
@@ -21,9 +21,13 @@ Un'estensione Firefox per salvare e ripristinare sessioni di lavoro nel browser.
 - Salva tutte le schede della finestra corrente come sessione con nome e colore
 - Ripristina le sessioni in una finestra separata con posizione di scroll preservata
 - Auto-sync: le finestre ripristinate tracciano le modifiche alle schede (aggiunta, rimozione, navigazione) e aggiornano la sessione automaticamente
-- Ricerca e filtro delle sessioni salvate per nome
+- Etichetta le sessioni con tag per organizzarle, cercabili dalla barra di filtro
+- Esporta tutte le sessioni (o una singola) come JSON per backup e migrazione
+- Importa sessioni da file JSON con validazione e gestione nomi duplicati
+- Ricerca e filtro delle sessioni salvate per nome o tag
 - Rinomina inline con gestione automatica dei duplicati
-- Supporto undo sulle azioni distruttive (eliminazione) tramite notifica toast
+- Supporto undo sulle azioni distruttive (eliminazione) tramite notifica toast - funziona anche se il popup viene chiuso
+- Indicatore spazio storage nel footer del popup
 - Tema chiaro e scuro seguendo la preferenza di sistema
 - Scorciatoie tastiera: Ctrl+Shift+S (salvataggio rapido), Ctrl+Shift+W (apri popup)
 
@@ -88,22 +92,28 @@ sequenceDiagram
 
 ```text
 .
-├── background/            # Logica sessioni, storage, auto-sync, validazione
-│   ├── background.js      # CRUD, message handler, tracking finestre
-│   └── validation.js      # Costanti, sanitizzazione input, filtro URL
+├── background/              # Logica sessioni (modulare)
+│   ├── validation.js        # Costanti, sanitizzazione input, validazione URL e tag
+│   ├── storage.js           # Helper storage lettura/scrittura
+│   ├── session-crud.js      # Salva, ripristina, elimina, rinomina, aggiorna, tag
+│   ├── auto-sync.js         # Sync finestre tracciate, ripristino scroll, event listener
+│   ├── export-import.js     # Export/import JSON con validazione, statistiche storage
+│   └── background.js        # Message listener, eliminazione differita, scorciatoie
 ├── content/
-│   └── scroll-capture.js  # Get/restore posizione scroll via messaggi
-├── popup/                 # UI popup dell'estensione
-│   ├── popup.html         # Markup popup
-│   ├── popup.js           # Rendering lista sessioni, form, context menu
-│   ├── popup.css          # Stili tema chiaro/scuro
-│   ├── search.js          # Filtro sessioni in tempo reale
-│   ├── toast.js           # Notifiche toast con undo
-│   └── ui-utils.js        # Helper condivisi (escapeHtml, formatAge, colori)
-├── icons/                 # Icone estensione (16/32/48/96px)
-├── tests/                 # Test unitari Jest (jsdom)
-├── manifest.json          # Manifest estensione (Manifest V2)
-└── package.json           # Dipendenze dev e script
+│   └── scroll-capture.js    # Get/restore posizione scroll via messaggi
+├── popup/                   # UI popup dell'estensione
+│   ├── popup.html           # Markup popup
+│   ├── popup.js             # Lista sessioni, form salvataggio, context menu, rinomina
+│   ├── popup.css            # Stili tema chiaro/scuro
+│   ├── tags.js              # Input tag, editor tag modale
+│   ├── export-import.js     # UI export/import, indicatore storage
+│   ├── search.js            # Filtro sessioni per nome e tag in tempo reale
+│   ├── toast.js             # Notifiche toast (undo e informative)
+│   └── ui-utils.js          # Helper condivisi (escapeHtml, formatAge, colori)
+├── icons/                   # Icone estensione (16/32/48/96/128px)
+├── tests/                   # Test unitari Jest (jsdom)
+├── manifest.json            # Manifest estensione (Manifest V2)
+└── package.json             # Dipendenze dev e script
 ```
 
 ## Prerequisiti

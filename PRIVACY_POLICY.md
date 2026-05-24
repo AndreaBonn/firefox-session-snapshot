@@ -15,9 +15,17 @@ Session Snapshot saves the following information locally using Firefox's `browse
 - **Scroll positions** (horizontal and vertical) for each tab
 - **Session names** chosen by the user
 - **Session colors** chosen by the user
+- **Session tags** (labels) assigned by the user
 - **Timestamps** of when sessions were created or updated
 
 This data never leaves your browser. There is no server, no analytics, no telemetry.
+
+## Export and Import
+
+Session Snapshot allows users to export session data as a JSON file and import sessions from a JSON file. Both operations happen entirely on-device:
+
+- **Export** creates a local file download through the browser's standard download mechanism. No data is sent to any server.
+- **Import** reads a local JSON file selected by the user through the browser's standard file picker. The data is validated and stored locally.
 
 ## Permissions explained
 

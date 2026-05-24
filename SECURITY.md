@@ -23,13 +23,14 @@ Please include:
 
 ## Security Measures Implemented
 
-- **Input validation**: session names are sanitized and truncated to 100 characters (`background/validation.js:30-33`). Scroll values are bounded to a safe range (`background/validation.js:35-39`).
-- **Session ID validation**: session IDs are validated against a strict pattern before any mutation (`background/validation.js:22-24`, `background/background.js:432-438`).
-- **URL filtering**: only `https:`, `http:`, `ftp:`, and `file:` schemes are allowed when restoring tabs. Internal URLs (`about:`, `moz-extension:`) are excluded from saved sessions (`background/validation.js:41-52`).
-- **Content script protection**: mutation actions (`save-session`, `restore-session`, `delete-session`, `rename-session`, `update-session`) sent from content scripts are rejected (`background/background.js:422-429`).
-- **Content Security Policy**: `script-src 'self'; style-src 'self'; object-src 'self'` (`manifest.json:18`).
-- **Output escaping**: HTML output in the popup uses `escapeHtml()` to prevent XSS (`popup/ui-utils.js:15-18`, `popup/toast.js:21`).
-- **Color validation**: hex color values are validated against a strict pattern before use (`background/validation.js:26-28`).
+- **Input validation**: session names are sanitized and truncated to 100 characters. Scroll values are bounded to a safe range. Tag labels are sanitized, lowercased, and limited to 5 per session with 20 characters each (`background/validation.js`).
+- **Session ID validation**: session IDs are validated against a strict pattern before any mutation (`background/validation.js`, `background/background.js`).
+- **URL filtering**: only `https:`, `http:`, `ftp:`, and `file:` schemes are allowed when restoring tabs. Internal URLs (`about:`, `moz-extension:`) are excluded from saved sessions. Imported favicon URLs are filtered with the same scheme allowlist (`background/validation.js`, `background/export-import.js`).
+- **Import validation**: imported JSON data is validated for structure, field types, and size limits. Session IDs are regenerated on import to prevent collisions. Names are sanitized and deduplicated. Tabs with disallowed URL schemes are rejected (`background/export-import.js`).
+- **Content script protection**: mutation actions (`save-session`, `restore-session`, `delete-session`, `schedule-delete`, `cancel-delete`, `rename-session`, `update-session`, `update-session-tags`, `import-sessions`) sent from content scripts are rejected (`background/background.js`).
+- **Content Security Policy**: `script-src 'self'; style-src 'self'; object-src 'self'` (`manifest.json`).
+- **Output escaping**: HTML output in the popup uses `escapeHtml()` to prevent XSS. Tag labels are escaped before rendering (`popup/ui-utils.js`, `popup/tags.js`).
+- **Color validation**: hex color values are validated against a strict pattern before use (`background/validation.js`).
 - **Dependency pinning**: `package-lock.json` is committed.
 
 ## Out of Scope
