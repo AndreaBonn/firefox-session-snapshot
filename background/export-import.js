@@ -74,7 +74,10 @@ async function importSessions(jsonString) {
         index: i,
         url: t.url,
         title: sanitizeName(t.title) || t.url,
-        favIconUrl: typeof t.favIconUrl === "string" && isAllowedUrlScheme(t.favIconUrl) ? t.favIconUrl : null,
+        favIconUrl:
+          typeof t.favIconUrl === "string" && isAllowedUrlScheme(t.favIconUrl)
+            ? t.favIconUrl
+            : null,
         active: i === 0,
         pinned: Boolean(t.pinned),
         scrollX: sanitizeScroll(t.scrollX),
