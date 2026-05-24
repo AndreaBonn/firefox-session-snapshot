@@ -72,7 +72,8 @@ async function syncTrackedWindow(windowId) {
     await browser.storage.local.set({
       [`${STORAGE_SESSION_PREFIX}${sessionId}`]: updatedSession,
     });
-  } catch {
+  } catch (err) {
+    console.warn("Session Snapshot: sync failed for window", windowId, "-", err);
     await untrackWindow(windowId);
   }
 }
