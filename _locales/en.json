@@ -43,6 +43,7 @@
   "error.invalid_format": "Invalid data format",
   "error.missing_sessions_field": "Field 'sessions' missing or invalid",
   "error.no_sessions_to_import": "No sessions to import",
+  "error.max_sessions_reached": "Session limit of {{max}} reached",
   "error.too_many_sessions": "Too many sessions (max {{max}})",
   "error.invalid_session_in_file": "Invalid session in file",
   "error.session_no_tabs": "Session \"{{name}}\" has no tabs",

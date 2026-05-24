@@ -51,9 +51,13 @@ async function saveSession(name, color, tags) {
     })
   );
 
+  const index = await getIndex();
+  if (index.length >= MAX_SESSIONS) {
+    return { success: false, error: t("error.max_sessions_reached", { max: MAX_SESSIONS }) };
+  }
+
   const now = Date.now();
   const id = `sess_${now}_${Math.random().toString(36).slice(2, 8)}`;
-  const index = await getIndex();
 
   const locale = i18nGetLang() === "en" ? "en-US" : "it-IT";
   const defaultName = t("default.session_name", { date: new Date(now).toLocaleDateString(locale) });

@@ -17,6 +17,7 @@ const MAX_SCROLL_VALUE = 200000;
 const MAX_TAGS_PER_SESSION = 5;
 const MAX_TAG_LENGTH = 20;
 const TAG_PATTERN = /^[a-zA-Z0-9À-ÿ][a-zA-Z0-9À-ÿ\s-]*$/;
+const MAX_SESSIONS = 200;
 
 function isValidSessionId(sessionId) {
   if (typeof sessionId !== "string") return false;

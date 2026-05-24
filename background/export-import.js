@@ -59,9 +59,15 @@ async function importSessions(jsonString) {
   }
 
   const index = await getIndex();
-  const imported = [];
+  const available = MAX_SESSIONS - index.length;
+  if (available <= 0) {
+    return { success: false, error: t("error.max_sessions_reached", { max: MAX_SESSIONS }) };
+  }
 
-  for (const entry of parsed.sessions) {
+  const imported = [];
+  const sessionsToImport = parsed.sessions.slice(0, available);
+
+  for (const entry of sessionsToImport) {
     const now = Date.now();
     const id = `sess_${now}_${Math.random().toString(36).slice(2, 8)}`;
 

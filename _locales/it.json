@@ -43,6 +43,7 @@
   "error.invalid_format": "Formato dati non valido",
   "error.missing_sessions_field": "Campo 'sessions' mancante o non valido",
   "error.no_sessions_to_import": "Nessuna sessione da importare",
+  "error.max_sessions_reached": "Limite di {{max}} sessioni raggiunto",
   "error.too_many_sessions": "Troppe sessioni (max {{max}})",
   "error.invalid_session_in_file": "Sessione non valida nel file",
   "error.session_no_tabs": "Sessione \"{{name}}\" senza schede",
