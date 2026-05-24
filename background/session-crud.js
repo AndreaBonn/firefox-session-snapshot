@@ -32,7 +32,7 @@ async function saveSession(name, color, tags) {
   const validTabs = currentWindow.tabs.filter((tab) => !isExcludedUrl(tab.url));
 
   if (validTabs.length === 0) {
-    return { success: false, error: "Nessuna scheda valida da salvare" };
+    return { success: false, error: t("error.no_valid_tabs") };
   }
 
   const tabs = await Promise.all(
@@ -55,7 +55,8 @@ async function saveSession(name, color, tags) {
   const id = `sess_${now}`;
   const index = await getIndex();
 
-  const defaultName = `Sessione del ${new Date(now).toLocaleDateString("it-IT")}`;
+  const locale = i18nGetLang() === "en" ? "en-US" : "it-IT";
+  const defaultName = t("default.session_name", { date: new Date(now).toLocaleDateString(locale) });
   const sanitizedName = sanitizeName(name) || defaultName;
   const resolvedName = await deduplicateName(sanitizedName, null);
   const validColor = isValidColor(color) ? color : getAutoColor(index.length);
@@ -87,11 +88,11 @@ async function saveSessionWithId(sessionId, name, color) {
   const validTabs = currentWindow.tabs.filter((tab) => !isExcludedUrl(tab.url));
 
   if (validTabs.length === 0) {
-    return { success: false, error: "Nessuna scheda valida da salvare" };
+    return { success: false, error: t("error.no_valid_tabs") };
   }
 
   const existing = await getSession(sessionId);
-  if (!existing) return { success: false, error: "Sessione non trovata" };
+  if (!existing) return { success: false, error: t("error.session_not_found") };
 
   const tabs = await Promise.all(
     validTabs.map(async (tab) => {
@@ -128,11 +129,11 @@ async function saveSessionWithId(sessionId, name, color) {
 
 async function restoreSession(sessionId) {
   const session = await getSession(sessionId);
-  if (!session) return { success: false, error: "Sessione non trovata" };
+  if (!session) return { success: false, error: t("error.session_not_found") };
 
-  const safeTabs = session.tabs.filter((t) => isAllowedUrlScheme(t.url));
+  const safeTabs = session.tabs.filter((tab) => isAllowedUrlScheme(tab.url));
   if (safeTabs.length === 0) {
-    return { success: false, error: "Nessuna scheda con URL valido" };
+    return { success: false, error: t("error.no_valid_url_tabs") };
   }
 
   const firstTab = safeTabs.find((t) => !t.pinned) || safeTabs[0];
@@ -198,10 +199,10 @@ async function deleteSession(sessionId) {
 
 async function renameSession(sessionId, newName) {
   const session = await getSession(sessionId);
-  if (!session) return { success: false, error: "Sessione non trovata" };
+  if (!session) return { success: false, error: t("error.session_not_found") };
 
   const sanitized = sanitizeName(newName);
-  if (!sanitized) return { success: false, error: "Nome non valido" };
+  if (!sanitized) return { success: false, error: t("error.invalid_name") };
   const resolvedName = await deduplicateName(sanitized, sessionId);
   session.name = resolvedName;
   session.updatedAt = Date.now();
@@ -215,13 +216,13 @@ async function renameSession(sessionId, newName) {
 
 async function updateSession(sessionId) {
   const existing = await getSession(sessionId);
-  if (!existing) return { success: false, error: "Sessione non trovata" };
+  if (!existing) return { success: false, error: t("error.session_not_found") };
   return saveSessionWithId(sessionId, existing.name, existing.color);
 }
 
 async function updateSessionTags(sessionId, tags) {
   const session = await getSession(sessionId);
-  if (!session) return { success: false, error: "Sessione non trovata" };
+  if (!session) return { success: false, error: t("error.session_not_found") };
 
   session.tags = sanitizeTags(tags);
   session.updatedAt = Date.now();

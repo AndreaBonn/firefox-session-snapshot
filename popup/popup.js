@@ -9,6 +9,10 @@ let cachedSessions = [];
 // --- Initialization ---
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const dictionaries = await I18N_DICTIONARIES_PROMISE;
+  await i18nInit(dictionaries);
+  translatePage();
+  initLangSwitcher();
   renderColorPicker();
   await loadSessions();
   await loadStorageStats();
@@ -37,11 +41,11 @@ async function loadSessions() {
     list.classList.add("hidden");
     list.innerHTML = "";
     empty.classList.remove("hidden");
-    count.textContent = "Nessuna sessione";
+    count.textContent = t("sessions.empty");
     return;
   }
 
-  count.textContent = `Le tue sessioni (${cachedSessions.length})`;
+  count.textContent = t("sessions.count", { count: cachedSessions.length });
   list.innerHTML = cachedSessions.map(renderSession).join("");
   applySessionColors(list);
   list.classList.remove("hidden");
@@ -70,15 +74,15 @@ function renderSession(session) {
       <div class="ss-session-info">
         <div class="ss-session-name">${escapeHtml(session.name)}</div>
         <div class="ss-session-meta">
-          ${session.tabCount} schede &middot; ${age}
+          ${t("session.tabs", { count: session.tabCount })} &middot; ${age}
         </div>
         ${tagsHtml}
       </div>
       <div class="ss-session-actions">
-        <button class="ss-restore-btn" data-id="${session.id}" title="Ripristina in nuova finestra">
+        <button class="ss-restore-btn" data-id="${session.id}" title="${t("session.restore_title")}">
           &#9654;
         </button>
-        <button class="ss-menu-btn" data-id="${session.id}" title="Opzioni">
+        <button class="ss-menu-btn" data-id="${session.id}" title="${t("session.options_title")}">
           &#8942;
         </button>
       </div>
@@ -238,20 +242,20 @@ function renderContextMenu(sessionId) {
   return `
     <div class="ss-context-menu" data-id="${sessionId}">
       <button class="ss-menu-item" data-action="update">
-        Aggiorna con schede correnti
+        ${t("menu.update")}
       </button>
       <button class="ss-menu-item" data-action="rename">
-        Rinomina
+        ${t("menu.rename")}
       </button>
       <button class="ss-menu-item" data-action="edit-tags">
-        Gestisci tag
+        ${t("menu.edit_tags")}
       </button>
       <button class="ss-menu-item" data-action="export-one">
-        Esporta sessione
+        ${t("menu.export")}
       </button>
       <hr />
       <button class="ss-menu-item ss-danger" data-action="delete">
-        Elimina
+        ${t("menu.delete")}
       </button>
     </div>
   `;
@@ -304,7 +308,7 @@ async function handleMenuAction(action, sessionId) {
       await browser.runtime.sendMessage({ action: "schedule-delete", sessionId });
 
       showUndoToast(
-        `"${sessionName}" eliminata`,
+        t("toast.deleted", { name: sessionName }),
         () => {},
         async () => {
           await browser.runtime.sendMessage({ action: "cancel-delete", sessionId });
@@ -320,9 +324,9 @@ async function handleMenuAction(action, sessionId) {
 function updateSessionCount() {
   const count = document.getElementById("ss-sessions-count");
   if (cachedSessions.length <= 0) {
-    count.textContent = "Nessuna sessione";
+    count.textContent = t("sessions.empty");
   } else {
-    count.textContent = `Le tue sessioni (${cachedSessions.length})`;
+    count.textContent = t("sessions.count", { count: cachedSessions.length });
   }
 }
 
@@ -373,4 +377,33 @@ function startInlineRename(sessionId) {
   });
 
   input.addEventListener("blur", confirmRename);
+}
+
+// --- Language switcher ---
+
+function initLangSwitcher() {
+  const switcher = document.getElementById("ss-lang-switcher");
+  updateLangButtons();
+
+  switcher.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".ss-lang-btn");
+    if (!btn) return;
+
+    const lang = btn.dataset.lang;
+    if (lang === i18nGetLang()) return;
+
+    await i18nSetLang(lang);
+    translatePage();
+    updateLangButtons();
+    await loadSessions();
+    await loadStorageStats();
+  });
+}
+
+function updateLangButtons() {
+  const currentLang = i18nGetLang();
+  document.querySelectorAll(".ss-lang-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+  document.documentElement.lang = currentLang;
 }

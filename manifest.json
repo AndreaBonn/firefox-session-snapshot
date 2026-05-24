@@ -2,7 +2,8 @@
   "manifest_version": 2,
   "name": "Session Snapshot",
   "version": "1.2.0",
-  "description": "Salva e ripristina sessioni di lavoro per progetto. Ogni sessione ricorda schede e posizione di scroll.",
+  "default_locale": "it",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -14,6 +15,8 @@
   "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
   "background": {
     "scripts": [
+      "shared/i18n.js",
+      "background/i18n-init.js",
       "background/validation.js",
       "background/storage.js",
       "background/session-crud.js",
@@ -45,14 +48,14 @@
         "default": "Ctrl+Shift+S",
         "mac": "MacCtrl+Shift+S"
       },
-      "description": "Salva rapidamente la sessione corrente"
+      "description": "__MSG_commandSaveSession__"
     },
     "open-popup": {
       "suggested_key": {
         "default": "Ctrl+Shift+W",
         "mac": "MacCtrl+Shift+W"
       },
-      "description": "Apri Session Snapshot"
+      "description": "__MSG_commandOpenPopup__"
     }
   },
   "browser_specific_settings": {

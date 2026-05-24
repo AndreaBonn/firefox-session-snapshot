@@ -1,0 +1,11 @@
+{
+  "extensionDescription": {
+    "message": "Salva e ripristina sessioni di lavoro per progetto. Ogni sessione ricorda schede e posizione di scroll."
+  },
+  "commandSaveSession": {
+    "message": "Salva rapidamente la sessione corrente"
+  },
+  "commandOpenPopup": {
+    "message": "Apri Session Snapshot"
+  }
+}

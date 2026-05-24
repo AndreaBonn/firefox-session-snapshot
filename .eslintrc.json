@@ -10,11 +10,44 @@
     "ecmaVersion": 2020,
     "sourceType": "script"
   },
+  "globals": {
+    "i18nInit": "writable",
+    "i18nSetLang": "writable",
+    "i18nGetLang": "writable",
+    "t": "writable",
+    "translatePage": "writable",
+    "I18N_DICTIONARIES_PROMISE": "writable",
+    "I18N_BG_READY": "writable",
+    "initLangSwitcher": "writable",
+    "updateLangButtons": "writable",
+    "i18nCurrentLang": "writable",
+    "i18nDictionary": "writable",
+    "i18nDictionaries": "writable",
+    "I18N_STORAGE_KEY": "writable",
+    "I18N_DEFAULT_LANG": "writable",
+    "I18N_SUPPORTED_LANGS": "writable"
+  },
   "rules": {
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "eqeqeq": "error",
     "no-var": "error",
     "prefer-const": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["shared/i18n.js", "shared/dictionaries.js", "background/i18n-init.js"],
+      "rules": {
+        "no-unused-vars": "off",
+        "no-redeclare": "off"
+      }
+    },
+    {
+      "files": ["popup/popup.js"],
+      "globals": {
+        "initLangSwitcher": "off",
+        "updateLangButtons": "off"
+      }
+    }
+  ]
 }

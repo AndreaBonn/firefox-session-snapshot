@@ -19,7 +19,7 @@ function showUndoToast(message, onConfirm, onUndo) {
 
   toast.innerHTML = `
     <span class="ss-toast-message">${escapeHtml(message)}</span>
-    <button class="ss-toast-undo" type="button">Annulla</button>
+    <button class="ss-toast-undo" type="button">${t("toast.undo")}</button>
     <div class="ss-toast-progress" id="${progressId}"></div>
   `;
 

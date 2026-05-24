@@ -122,6 +122,28 @@ global.browser = {
   commands: commandsMock,
 };
 
+// --- i18n mocks (global functions used by all modules) ---
+
+const i18nItDict = JSON.parse(
+  require("fs").readFileSync(require("path").resolve(__dirname, "../_locales/it.json"), "utf-8")
+);
+
+global.i18nInit = jest.fn(async () => "it");
+global.i18nSetLang = jest.fn(async () => {});
+global.i18nGetLang = jest.fn(() => "it");
+global.t = jest.fn((key, params) => {
+  let value = i18nItDict[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      value = value.replace(new RegExp(`{{${k}}}`, "g"), String(v));
+    }
+  }
+  return value;
+});
+global.translatePage = jest.fn();
+
+global.I18N_DICTIONARIES_PROMISE = Promise.resolve({ it: i18nItDict, en: {} });
+
 // Helper to reset storage between tests
 global.resetBrowserMocks = () => {
   storageMock._clear();

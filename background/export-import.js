@@ -15,7 +15,7 @@ async function exportSessions() {
 
 async function exportSingleSession(sessionId) {
   const session = await getSession(sessionId);
-  if (!session) return { success: false, error: "Sessione non trovata" };
+  if (!session) return { success: false, error: t("error.session_not_found") };
 
   return {
     success: true,
@@ -50,7 +50,7 @@ async function importSessions(jsonString) {
   try {
     parsed = JSON.parse(jsonString);
   } catch {
-    return { success: false, error: "JSON non valido" };
+    return { success: false, error: t("error.invalid_json") };
   }
 
   const validation = validateImportData(parsed);
@@ -65,7 +65,7 @@ async function importSessions(jsonString) {
     const now = Date.now();
     const id = `sess_${now}_${Math.random().toString(36).slice(2, 8)}`;
 
-    const sanitizedName = sanitizeName(entry.name) || "Sessione importata";
+    const sanitizedName = sanitizeName(entry.name) || t("default.imported_session");
     const resolvedName = await deduplicateName(sanitizedName, null);
 
     const tabs = (entry.tabs || [])
@@ -113,26 +113,26 @@ async function importSessions(jsonString) {
 
 function validateImportData(data) {
   if (!data || typeof data !== "object") {
-    return { valid: false, error: "Formato dati non valido" };
+    return { valid: false, error: t("error.invalid_format") };
   }
   if (!Array.isArray(data.sessions)) {
-    return { valid: false, error: "Campo 'sessions' mancante o non valido" };
+    return { valid: false, error: t("error.missing_sessions_field") };
   }
   if (data.sessions.length === 0) {
-    return { valid: false, error: "Nessuna sessione da importare" };
+    return { valid: false, error: t("error.no_sessions_to_import") };
   }
 
   const MAX_IMPORT_SESSIONS = 100;
   if (data.sessions.length > MAX_IMPORT_SESSIONS) {
-    return { valid: false, error: `Troppe sessioni (max ${MAX_IMPORT_SESSIONS})` };
+    return { valid: false, error: t("error.too_many_sessions", { max: MAX_IMPORT_SESSIONS }) };
   }
 
   for (const session of data.sessions) {
     if (!session || typeof session !== "object") {
-      return { valid: false, error: "Sessione non valida nel file" };
+      return { valid: false, error: t("error.invalid_session_in_file") };
     }
     if (!Array.isArray(session.tabs) || session.tabs.length === 0) {
-      return { valid: false, error: `Sessione "${session.name || "?"}" senza schede` };
+      return { valid: false, error: t("error.session_no_tabs", { name: session.name || "?" }) };
     }
   }
 

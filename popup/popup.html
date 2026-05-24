@@ -13,8 +13,16 @@
         <span>Session Snapshot</span>
       </div>
       <div id="ss-header-actions">
-        <button id="ss-export-btn" title="Esporta sessioni">&#8681;</button>
-        <label id="ss-import-label" title="Importa sessioni">
+        <div id="ss-lang-switcher">
+          <button class="ss-lang-btn" data-lang="it" title="Italiano">
+            <img src="../icons/flag-it.svg" alt="IT" width="20" height="14" />
+          </button>
+          <button class="ss-lang-btn" data-lang="en" title="English">
+            <img src="../icons/flag-en.svg" alt="EN" width="20" height="14" />
+          </button>
+        </div>
+        <button id="ss-export-btn" data-i18n-title="header.export">&#8681;</button>
+        <label id="ss-import-label" data-i18n-title="header.import">
           &#8679;
           <input id="ss-import-input" type="file" accept=".json" class="hidden" />
         </label>
@@ -23,12 +31,15 @@
 
     <div id="ss-save-section">
       <div id="ss-save-collapsed">
-        <button id="ss-save-btn"><span>+</span> Salva sessione corrente</button>
+        <button id="ss-save-btn">
+          <span>+</span> <span data-i18n="save.button">Salva sessione corrente</span>
+        </button>
       </div>
       <div id="ss-save-expanded" class="hidden">
         <input
           id="ss-session-name"
           type="text"
+          data-i18n-placeholder="save.name_placeholder"
           placeholder="Nome sessione (es. Progetto A)"
           maxlength="50"
         />
@@ -37,25 +48,27 @@
           <input
             id="ss-tag-input"
             type="text"
+            data-i18n-placeholder="save.tag_placeholder"
             placeholder="Aggiungi tag e premi Invio"
             maxlength="20"
           />
           <div id="ss-tag-list"></div>
         </div>
         <div id="ss-save-actions">
-          <button id="ss-save-confirm">Salva</button>
-          <button id="ss-save-cancel">Annulla</button>
+          <button id="ss-save-confirm" data-i18n="save.confirm">Salva</button>
+          <button id="ss-save-cancel" data-i18n="save.cancel">Annulla</button>
         </div>
       </div>
     </div>
 
     <div id="ss-sessions-section">
       <div id="ss-sessions-header">
-        <span id="ss-sessions-count">Le tue sessioni</span>
+        <span id="ss-sessions-count" data-i18n="sessions.title">Le tue sessioni</span>
         <div id="ss-search-wrapper">
           <input
             id="ss-search-input"
             type="search"
+            data-i18n-placeholder="search.placeholder"
             placeholder="Cerca per nome o tag..."
             autocomplete="off"
           />
@@ -63,11 +76,11 @@
       </div>
       <div id="ss-sessions-list"></div>
       <div id="ss-empty-state" class="hidden">
-        <p>Nessuna sessione salvata.</p>
-        <p>Clicca "+ Salva sessione corrente" per iniziare.</p>
+        <p data-i18n="empty.title">Nessuna sessione salvata.</p>
+        <p data-i18n="empty.hint">Clicca "+ Salva sessione corrente" per iniziare.</p>
       </div>
       <div id="ss-no-results" class="hidden">
-        <p>Nessuna sessione trovata.</p>
+        <p data-i18n="no_results.title">Nessuna sessione trovata.</p>
       </div>
     </div>
 
@@ -79,20 +92,23 @@
 
     <div id="ss-tag-editor-overlay" class="hidden">
       <div id="ss-tag-editor">
-        <div id="ss-tag-editor-title">Gestisci tag</div>
+        <div id="ss-tag-editor-title" data-i18n="tag_editor.title">Gestisci tag</div>
         <input
           id="ss-tag-editor-input"
           type="text"
+          data-i18n-placeholder="save.tag_placeholder"
           placeholder="Aggiungi tag e premi Invio"
           maxlength="20"
         />
         <div id="ss-tag-editor-list"></div>
         <div id="ss-tag-editor-actions">
-          <button id="ss-tag-editor-done">Fatto</button>
+          <button id="ss-tag-editor-done" data-i18n="tag_editor.done">Fatto</button>
         </div>
       </div>
     </div>
 
+    <script src="../shared/i18n.js"></script>
+    <script src="../shared/dictionaries.js"></script>
     <script src="ui-utils.js"></script>
     <script src="toast.js"></script>
     <script src="search.js"></script>

@@ -56,7 +56,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     "export-session",
   ];
   if (needsSessionId.includes(message.action) && !isValidSessionId(message.sessionId)) {
-    sendResponse({ success: false, error: "ID sessione non valido" });
+    sendResponse({ success: false, error: t("error.invalid_session_id") });
     return true;
   }
 

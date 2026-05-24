@@ -1,0 +1,11 @@
+{
+  "extensionDescription": {
+    "message": "Save and restore work sessions per project. Each session remembers tabs and scroll position."
+  },
+  "commandSaveSession": {
+    "message": "Quickly save current session"
+  },
+  "commandOpenPopup": {
+    "message": "Open Session Snapshot"
+  }
+}

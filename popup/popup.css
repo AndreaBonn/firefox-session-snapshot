@@ -85,6 +85,33 @@ body {
   align-items: center;
 }
 
+#ss-lang-switcher {
+  display: flex;
+  gap: 2px;
+  margin-right: 4px;
+}
+
+.ss-lang-btn {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s;
+}
+
+.ss-lang-btn:hover {
+  opacity: 0.8;
+}
+
+.ss-lang-btn.active {
+  opacity: 1;
+  border-color: var(--ss-accent);
+}
+
 #ss-export-btn,
 #ss-import-label {
   display: flex;

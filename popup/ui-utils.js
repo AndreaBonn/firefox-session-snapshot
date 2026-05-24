@@ -31,16 +31,18 @@ function formatAge(timestamp) {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return "Salvata ora";
-  if (minutes < 60) return `Salvata ${minutes} min fa`;
+  const locale = i18nGetLang() === "en" ? "en-US" : "it-IT";
+
+  if (minutes < 1) return t("age.just_now");
+  if (minutes < 60) return t("age.minutes_ago", { minutes });
   if (hours < 24) {
-    const time = new Date(timestamp).toLocaleTimeString("it-IT", {
+    const time = new Date(timestamp).toLocaleTimeString(locale, {
       hour: "2-digit",
       minute: "2-digit",
     });
-    return `Salvata oggi, ${time}`;
+    return t("age.today", { time });
   }
-  if (days === 1) return "Salvata ieri";
-  if (days < 7) return `Salvata ${days} giorni fa`;
-  return `Salvata il ${new Date(timestamp).toLocaleDateString("it-IT")}`;
+  if (days === 1) return t("age.yesterday");
+  if (days < 7) return t("age.days_ago", { days });
+  return t("age.date", { date: new Date(timestamp).toLocaleDateString(locale) });
 }
