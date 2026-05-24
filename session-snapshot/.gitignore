@@ -1,6 +1,0 @@
-node_modules/
-.env
-*.xpi
-web-ext-artifacts/
-.DS_Store
-coverage/
