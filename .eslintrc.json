@@ -25,7 +25,9 @@
     "i18nDictionaries": "writable",
     "I18N_STORAGE_KEY": "writable",
     "I18N_DEFAULT_LANG": "writable",
-    "I18N_SUPPORTED_LANGS": "writable"
+    "I18N_SUPPORTED_LANGS": "writable",
+    "AUTO_COLORS": "readonly",
+    "HEX_COLOR_PATTERN": "readonly"
   },
   "rules": {
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -43,10 +45,86 @@
       }
     },
     {
+      "files": ["shared/constants.js"],
+      "rules": {
+        "no-unused-vars": "off",
+        "no-redeclare": "off"
+      }
+    },
+    {
+      "files": ["background/validation.js"],
+      "globals": {
+        "MAX_SESSIONS": "readonly"
+      },
+      "rules": {
+        "no-redeclare": "off"
+      }
+    },
+    {
+      "files": ["background/export-import.js", "background/session-crud.js"],
+      "globals": {
+        "MAX_SESSIONS": "readonly"
+      }
+    },
+    {
       "files": ["popup/popup.js"],
       "globals": {
         "initLangSwitcher": "off",
-        "updateLangButtons": "off"
+        "updateLangButtons": "off",
+        "openMenuId": "writable",
+        "toggleContextMenu": "readonly",
+        "handleMenuAction": "readonly",
+        "closeContextMenu": "readonly",
+        "initSearch": "readonly",
+        "filterSessionList": "readonly",
+        "handleExport": "readonly",
+        "handleImport": "readonly",
+        "loadStorageStats": "readonly",
+        "initSaveTagEvents": "readonly",
+        "getSaveTags": "readonly",
+        "resetSaveTags": "readonly",
+        "initTagEditorEvents": "readonly",
+        "openTagEditor": "readonly",
+        "startInlineRename": "readonly"
+      }
+    },
+    {
+      "files": ["popup/context-menu.js"],
+      "globals": {
+        "refreshAll": "readonly",
+        "startInlineRename": "readonly",
+        "openTagEditor": "readonly",
+        "cachedSessions": "writable",
+        "showUndoToast": "readonly",
+        "downloadJson": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          {
+            "varsIgnorePattern": "^(toggleContextMenu|handleMenuAction)$",
+            "argsIgnorePattern": "^_"
+          }
+        ],
+        "require-atomic-updates": "off"
+      }
+    },
+    {
+      "files": ["popup/inline-rename.js"],
+      "globals": {
+        "loadSessions": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          { "varsIgnorePattern": "^startInlineRename$", "argsIgnorePattern": "^_" }
+        ]
+      }
+    },
+    {
+      "files": ["popup/ui-utils.js"],
+      "globals": {
+        "HEX_COLOR_PATTERN": "readonly"
       }
     }
   ]
