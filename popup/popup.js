@@ -343,7 +343,7 @@ function startInlineRename(sessionId) {
   input.type = "text";
   input.className = "ss-rename-input";
   input.value = currentName;
-  input.maxLength = 50;
+  input.maxLength = 100;
 
   nameEl.replaceWith(input);
   input.focus();
