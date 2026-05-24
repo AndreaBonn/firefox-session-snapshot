@@ -12,6 +12,10 @@ A Firefox extension that saves and restores browser working sessions. Each sessi
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
 ![Version](https://img.shields.io/badge/version-1.1.0-green)
 
+|                         Light                          |                         Dark                         |
+| :----------------------------------------------------: | :--------------------------------------------------: |
+| ![Light theme](./docs/assets/popup-sessions-light.png) | ![Dark theme](./docs/assets/popup-sessions-dark.png) |
+
 ## Features
 
 - Save all tabs from the current window as a named, color-coded session

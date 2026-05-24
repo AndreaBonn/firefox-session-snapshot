@@ -12,6 +12,10 @@ Un'estensione Firefox per salvare e ripristinare sessioni di lavoro nel browser.
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
 ![Versione](https://img.shields.io/badge/versione-1.1.0-green)
 
+|                      Tema chiaro                       |                      Tema scuro                      |
+| :----------------------------------------------------: | :--------------------------------------------------: |
+| ![Tema chiaro](./docs/assets/popup-sessions-light.png) | ![Tema scuro](./docs/assets/popup-sessions-dark.png) |
+
 ## Funzionalita
 
 - Salva tutte le schede della finestra corrente come sessione con nome e colore
