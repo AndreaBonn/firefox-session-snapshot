@@ -7,14 +7,18 @@ A Firefox extension that saves and restores browser working sessions. Each sessi
 [![CI](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/test-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/coverage-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Firefox Add-on](https://img.shields.io/amo/v/session-snapshot-by-bonn?label=AMO&color=ff7139)](https://addons.mozilla.org/it/firefox/addon/session-snapshot-by-bonn/)
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
-![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
-![Version](https://img.shields.io/badge/version-1.2.0-green)
+![Firefox](https://img.shields.io/badge/firefox-%3E%3D109-ff7139)
 
 |                         Light                          |                         Dark                         |
 | :----------------------------------------------------: | :--------------------------------------------------: |
 | ![Light theme](./docs/assets/popup-sessions-light.png) | ![Dark theme](./docs/assets/popup-sessions-dark.png) |
+
+## Install
+
+**[Install from Firefox Add-ons (AMO)](https://addons.mozilla.org/it/firefox/addon/session-snapshot-by-bonn/)**
 
 ## Features
 
@@ -121,7 +125,7 @@ sequenceDiagram
 - Firefox 91 or later
 - Node.js 18+ (development only, for linting and tests)
 
-## Installation
+## Development setup
 
 1. Clone the repository:
 

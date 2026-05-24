@@ -7,14 +7,18 @@ Un'estensione Firefox per salvare e ripristinare sessioni di lavoro nel browser.
 [![CI](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/test-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/coverage-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Firefox Add-on](https://img.shields.io/amo/v/session-snapshot-by-bonn?label=AMO&color=ff7139)](https://addons.mozilla.org/it/firefox/addon/session-snapshot-by-bonn/)
 ![Licenza: Apache 2.0](https://img.shields.io/badge/licenza-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
-![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
-![Versione](https://img.shields.io/badge/versione-1.2.0-green)
+![Firefox](https://img.shields.io/badge/firefox-%3E%3D109-ff7139)
 
 |                      Tema chiaro                       |                      Tema scuro                      |
 | :----------------------------------------------------: | :--------------------------------------------------: |
 | ![Tema chiaro](./docs/assets/popup-sessions-light.png) | ![Tema scuro](./docs/assets/popup-sessions-dark.png) |
+
+## Installazione
+
+**[Installa da Firefox Add-ons (AMO)](https://addons.mozilla.org/it/firefox/addon/session-snapshot-by-bonn/)**
 
 ## Funzionalita
 
@@ -121,7 +125,7 @@ sequenceDiagram
 - Firefox 91 o successivo
 - Node.js 18+ (solo per sviluppo: linting e test)
 
-## Installazione
+## Setup sviluppo
 
 1. Clona il repository:
 
