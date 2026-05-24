@@ -41,6 +41,12 @@ const tabsMock = {
     ...opts,
   })),
   update: jest.fn(async () => ({})),
+  onCreated: {
+    addListener: jest.fn(),
+  },
+  onRemoved: {
+    addListener: jest.fn(),
+  },
   onUpdated: {
     addListener: jest.fn(),
   },
@@ -74,6 +80,22 @@ const windowsMock = {
     id: 99,
     tabs: [{ id: 201, url: opts.url }],
   })),
+  get: jest.fn(async (windowId) => ({
+    id: windowId,
+    tabs: [
+      {
+        id: 301,
+        index: 0,
+        url: "https://example.com",
+        title: "Example",
+        active: true,
+        pinned: false,
+      },
+    ],
+  })),
+  onRemoved: {
+    addListener: jest.fn(),
+  },
 };
 
 const runtimeMock = {

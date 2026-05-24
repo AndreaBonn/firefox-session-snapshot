@@ -1,19 +1,10 @@
-// Session Snapshot - Popup UI
+// Session Snapshot - Popup UI (core)
 // Handles session list rendering, save form, context menu, and inline rename.
-
-const AUTO_COLORS = [
-  "#0969da", "#1a7f37", "#9a3412", "#6e40c9",
-  "#b45309", "#0e7490", "#be185d", "#374151",
-];
-
-const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+// Depends on: ui-utils.js, toast.js, search.js (loaded before this file)
 
 let selectedColor = null;
 let openMenuId = null;
-
-function safeColor(color) {
-  return HEX_COLOR_PATTERN.test(color) ? color : "#374151";
-}
+let cachedSessions = [];
 
 // --- Initialization ---
 
@@ -21,19 +12,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderColorPicker();
   await loadSessions();
   bindEvents();
+  initSearch();
 });
 
 // --- Session loading and rendering ---
 
 async function loadSessions() {
   const response = await browser.runtime.sendMessage({ action: "get-sessions" });
-  const sessions = response.sessions || [];
+  cachedSessions = response.sessions || [];
 
   const list = document.getElementById("ss-sessions-list");
   const empty = document.getElementById("ss-empty-state");
   const count = document.getElementById("ss-sessions-count");
 
-  if (sessions.length === 0) {
+  if (cachedSessions.length === 0) {
     list.classList.add("hidden");
     list.innerHTML = "";
     empty.classList.remove("hidden");
@@ -41,15 +33,20 @@ async function loadSessions() {
     return;
   }
 
-  count.textContent = `Le tue sessioni (${sessions.length})`;
-  list.innerHTML = sessions.map(renderSession).join("");
-  // Apply colors via JS to avoid inline styles (blocked by CSP style-src 'self')
-  list.querySelectorAll(".ss-session-color[data-color]").forEach((dot) => {
-    dot.style.backgroundColor = dot.dataset.color;
-  });
+  count.textContent = `Le tue sessioni (${cachedSessions.length})`;
+  list.innerHTML = cachedSessions.map(renderSession).join("");
+  applySessionColors(list);
   list.classList.remove("hidden");
   empty.classList.add("hidden");
   openMenuId = null;
+
+  filterSessionList();
+}
+
+function applySessionColors(container) {
+  container.querySelectorAll(".ss-session-color[data-color]").forEach((dot) => {
+    dot.style.backgroundColor = dot.dataset.color;
+  });
 }
 
 function renderSession(session) {
@@ -84,7 +81,6 @@ function renderColorPicker() {
           data-color="${color}"
           title="${color}"></div>`
   ).join("");
-  // Apply colors via JS to avoid inline styles (CSP compliance)
   picker.querySelectorAll(".ss-color-dot").forEach((dot) => {
     dot.style.backgroundColor = dot.dataset.color;
   });
@@ -98,7 +94,6 @@ function getSelectedColor() {
 // --- Event binding ---
 
 function bindEvents() {
-  // Save form toggle
   document.getElementById("ss-save-btn").addEventListener("click", () => {
     document.getElementById("ss-save-collapsed").classList.add("hidden");
     document.getElementById("ss-save-expanded").classList.remove("hidden");
@@ -119,27 +114,22 @@ function bindEvents() {
     await loadSessions();
   });
 
-  // Enter/Escape on name input
   document.getElementById("ss-session-name").addEventListener("keydown", (e) => {
     if (e.key === "Enter") document.getElementById("ss-save-confirm").click();
     if (e.key === "Escape") document.getElementById("ss-save-cancel").click();
   });
 
-  // Color picker delegation
   document.getElementById("ss-color-picker").addEventListener("click", (e) => {
     const dot = e.target.closest(".ss-color-dot");
     if (!dot) return;
-
     document.querySelectorAll(".ss-color-dot").forEach((d) => d.classList.remove("selected"));
     dot.classList.add("selected");
     selectedColor = dot.dataset.color;
   });
 
-  // Session list delegation
   document.getElementById("ss-sessions-list").addEventListener("click", async (e) => {
     const restoreBtn = e.target.closest(".ss-restore-btn");
     const menuBtn = e.target.closest(".ss-menu-btn");
-    const menuItem = e.target.closest(".ss-menu-item");
 
     if (restoreBtn) {
       await browser.runtime.sendMessage({
@@ -152,12 +142,9 @@ function bindEvents() {
 
     if (menuBtn) {
       toggleContextMenu(menuBtn.dataset.id);
-      return;
     }
-
   });
 
-  // Context menu item clicks + close on click outside (menu is on body)
   document.addEventListener("click", async (e) => {
     const menuItem = e.target.closest(".ss-menu-item");
     if (menuItem) {
@@ -200,7 +187,6 @@ function toggleContextMenu(sessionId) {
   const menuEl = wrapper.firstElementChild;
   document.body.appendChild(menuEl);
 
-  // Position below the menu button, aligned to its right edge
   const btnRect = menuBtn.getBoundingClientRect();
   const menuHeight = menuEl.offsetHeight;
   const menuWidth = menuEl.offsetWidth;
@@ -208,7 +194,6 @@ function toggleContextMenu(sessionId) {
   let top = btnRect.bottom + 2;
   let left = btnRect.right - menuWidth;
 
-  // Flip above button if no room below
   if (top + menuHeight > window.innerHeight) {
     top = btnRect.top - menuHeight - 2;
   }
@@ -258,14 +243,40 @@ async function handleMenuAction(action, sessionId) {
     }
 
     if (action === "delete") {
-      const confirmed = await showConfirm("Eliminare questa sessione?");
-      if (confirmed) {
-        await browser.runtime.sendMessage({ action: "delete-session", sessionId });
-        await loadSessions();
-      }
+      const session = cachedSessions.find((s) => s.id === sessionId);
+      const sessionName = session ? session.name : "Sessione";
+
+      // Optimistic removal from DOM
+      const item = document.querySelector(`.ss-session-item[data-id="${sessionId}"]`);
+      if (item) item.remove();
+
+      updateSessionCount(-1);
+
+      showUndoToast(
+        `"${sessionName}" eliminata`,
+        async () => {
+          // Timer expired: actually delete
+          await browser.runtime.sendMessage({ action: "delete-session", sessionId });
+          await loadSessions();
+        },
+        async () => {
+          // Undo: restore DOM
+          await loadSessions();
+        }
+      );
     }
   } catch (err) {
     console.error("Session Snapshot: action failed -", err);
+  }
+}
+
+function updateSessionCount(delta) {
+  const count = document.getElementById("ss-sessions-count");
+  const newTotal = cachedSessions.length + delta;
+  if (newTotal <= 0) {
+    count.textContent = "Nessuna sessione";
+  } else {
+    count.textContent = `Le tue sessioni (${newTotal})`;
   }
 }
 
@@ -318,58 +329,3 @@ function startInlineRename(sessionId) {
   input.addEventListener("blur", confirmRename);
 }
 
-// --- Confirm dialog ---
-
-function showConfirm(message) {
-  return new Promise((resolve) => {
-    const overlay = document.getElementById("ss-confirm-overlay");
-    const msg = document.getElementById("ss-confirm-message");
-    const okBtn = document.getElementById("ss-confirm-ok");
-    const cancelBtn = document.getElementById("ss-confirm-cancel");
-
-    msg.textContent = message;
-    overlay.classList.remove("hidden");
-
-    function cleanup(result) {
-      overlay.classList.add("hidden");
-      okBtn.removeEventListener("click", onOk);
-      cancelBtn.removeEventListener("click", onCancel);
-      resolve(result);
-    }
-
-    function onOk() { cleanup(true); }
-    function onCancel() { cleanup(false); }
-
-    okBtn.addEventListener("click", onOk);
-    cancelBtn.addEventListener("click", onCancel);
-  });
-}
-
-// --- Utilities ---
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function formatAge(timestamp) {
-  const now = Date.now();
-  const diff = now - timestamp;
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-
-  if (minutes < 1) return "Salvata ora";
-  if (minutes < 60) return `Salvata ${minutes} min fa`;
-  if (hours < 24) {
-    const time = new Date(timestamp).toLocaleTimeString("it-IT", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `Salvata oggi, ${time}`;
-  }
-  if (days === 1) return "Salvata ieri";
-  if (days < 7) return `Salvata ${days} giorni fa`;
-  return `Salvata il ${new Date(timestamp).toLocaleDateString("it-IT")}`;
-}

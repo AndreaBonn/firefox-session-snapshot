@@ -559,21 +559,228 @@ describe("background: restoreSession", () => {
   });
 });
 
+describe("background: auto-sync tracked windows", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("getTrackedWindows returns empty object when none tracked", async () => {
+    const tracked = await getTrackedWindows();
+    expect(tracked).toEqual({});
+  });
+
+  test("trackWindow persists windowId-to-sessionId mapping", async () => {
+    await trackWindow(42, "sess_100");
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBe("sess_100");
+  });
+
+  test("untrackWindow removes window from tracked map", async () => {
+    await trackWindow(42, "sess_100");
+    await trackWindow(43, "sess_200");
+    await untrackWindow(42);
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBeUndefined();
+    expect(tracked[43]).toBe("sess_200");
+  });
+
+  test("untrackSessionWindows removes all windows for a session", async () => {
+    await trackWindow(42, "sess_100");
+    await trackWindow(43, "sess_100");
+    await trackWindow(44, "sess_200");
+    await untrackSessionWindows("sess_100");
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBeUndefined();
+    expect(tracked[43]).toBeUndefined();
+    expect(tracked[44]).toBe("sess_200");
+  });
+
+  test("restoreSession starts tracking the new window", async () => {
+    browser.windows.create.mockResolvedValue({
+      id: 99,
+      tabs: [{ id: 501 }],
+    });
+
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: {
+        id: "sess_100",
+        name: "Test",
+        tabs: [
+          { index: 0, url: "https://a.com", pinned: false, active: true, scrollX: 0, scrollY: 0 },
+        ],
+      },
+    });
+
+    await restoreSession("sess_100");
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[99]).toBe("sess_100");
+  });
+
+  test("deleteSession removes tracked windows for that session", async () => {
+    await trackWindow(42, "sess_100");
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: { id: "sess_100", name: "Test" },
+    });
+
+    await deleteSession("sess_100");
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBeUndefined();
+  });
+});
+
+describe("background: syncTrackedWindow", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("updates session tabs from window state", async () => {
+    const session = {
+      id: "sess_100",
+      name: "Test",
+      color: "#0969da",
+      createdAt: 1000,
+      updatedAt: 1000,
+      windowId: 42,
+      tabs: [{ url: "https://old.com", index: 0 }],
+      tabCount: 1,
+    };
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: session,
+    });
+    await trackWindow(42, "sess_100");
+
+    browser.windows.get.mockResolvedValue({
+      id: 42,
+      tabs: [
+        { id: 301, index: 0, url: "https://new.com", title: "New", active: true, pinned: false },
+        { id: 302, index: 1, url: "https://another.com", title: "Another", active: false, pinned: false },
+      ],
+    });
+
+    await syncTrackedWindow(42);
+
+    const store = browser.storage._getStore();
+    const updated = store.snapshot_sess_100;
+    expect(updated.tabs).toHaveLength(2);
+    expect(updated.tabs[0].url).toBe("https://new.com");
+    expect(updated.tabs[1].url).toBe("https://another.com");
+    expect(updated.tabCount).toBe(2);
+    expect(updated.updatedAt).toBeGreaterThan(1000);
+    // Preserves name and color
+    expect(updated.name).toBe("Test");
+    expect(updated.color).toBe("#0969da");
+  });
+
+  test("untracks window if session no longer exists", async () => {
+    await trackWindow(42, "sess_nonexistent");
+
+    await syncTrackedWindow(42);
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBeUndefined();
+  });
+
+  test("skips sync for untracked window", async () => {
+    await syncTrackedWindow(999);
+    // No error thrown, no storage calls beyond getTrackedWindows
+    expect(browser.windows.get).not.toHaveBeenCalled();
+  });
+
+  test("untracks window when windows.get throws (window closed)", async () => {
+    await trackWindow(42, "sess_100");
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: { id: "sess_100", name: "Test", tabs: [], tabCount: 0 },
+    });
+    browser.windows.get.mockRejectedValue(new Error("Invalid window ID"));
+
+    await syncTrackedWindow(42);
+
+    const tracked = await getTrackedWindows();
+    expect(tracked[42]).toBeUndefined();
+  });
+
+  test("excludes about: tabs from synced session", async () => {
+    await trackWindow(42, "sess_100");
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: { id: "sess_100", name: "Test", tabs: [], tabCount: 0, updatedAt: 1000 },
+    });
+
+    browser.windows.get.mockResolvedValue({
+      id: 42,
+      tabs: [
+        { id: 301, index: 0, url: "https://valid.com", title: "Valid", active: true, pinned: false },
+        { id: 302, index: 1, url: "about:newtab", title: "New Tab", active: false, pinned: false },
+      ],
+    });
+
+    await syncTrackedWindow(42);
+
+    const store = browser.storage._getStore();
+    expect(store.snapshot_sess_100.tabs).toHaveLength(1);
+    expect(store.snapshot_sess_100.tabs[0].url).toBe("https://valid.com");
+  });
+});
+
+describe("background: buildTabsFromWindow", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("builds tab array excluding internal URLs", async () => {
+    browser.windows.get.mockResolvedValue({
+      id: 10,
+      tabs: [
+        { id: 1, index: 0, url: "https://example.com", title: "Ex", active: true, pinned: false },
+        { id: 2, index: 1, url: "about:blank", title: "Blank", active: false, pinned: false },
+      ],
+    });
+
+    const tabs = await buildTabsFromWindow(10);
+    expect(tabs).toHaveLength(1);
+    expect(tabs[0].url).toBe("https://example.com");
+    expect(tabs[0].scrollX).toBe(0);
+    expect(tabs[0].scrollY).toBe(0);
+  });
+});
+
 describe("background: listener registration", () => {
-  // Listeners are registered at script load time (loadScript at top of file).
-  // We capture the call counts immediately after load, before any beforeEach reset.
   const listenerCounts = {
     onMessage: browser.runtime.onMessage.addListener.mock.calls.length,
     onUpdated: browser.tabs.onUpdated.addListener.mock.calls.length,
+    onCreated: browser.tabs.onCreated.addListener.mock.calls.length,
+    onRemoved: browser.tabs.onRemoved.addListener.mock.calls.length,
     onCommand: browser.commands.onCommand.addListener.mock.calls.length,
+    windowsOnRemoved: browser.windows.onRemoved.addListener.mock.calls.length,
   };
 
   test("registers message listener on load", () => {
     expect(listenerCounts.onMessage).toBeGreaterThanOrEqual(1);
   });
 
-  test("registers tabs.onUpdated listener for scroll restore", () => {
+  test("registers tabs.onUpdated listener for scroll restore and auto-sync", () => {
     expect(listenerCounts.onUpdated).toBeGreaterThanOrEqual(1);
+  });
+
+  test("registers tabs.onCreated listener for auto-sync", () => {
+    expect(listenerCounts.onCreated).toBeGreaterThanOrEqual(1);
+  });
+
+  test("registers tabs.onRemoved listener for auto-sync", () => {
+    expect(listenerCounts.onRemoved).toBeGreaterThanOrEqual(1);
+  });
+
+  test("registers windows.onRemoved listener for cleanup", () => {
+    expect(listenerCounts.windowsOnRemoved).toBeGreaterThanOrEqual(1);
   });
 
   test("registers commands listener for keyboard shortcuts", () => {

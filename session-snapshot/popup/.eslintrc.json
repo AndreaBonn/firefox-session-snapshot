@@ -1,0 +1,43 @@
+{
+  "overrides": [
+    {
+      "files": ["ui-utils.js"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["toast.js"],
+      "globals": {
+        "escapeHtml": "readonly"
+      },
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["search.js"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    },
+    {
+      "files": ["popup.js"],
+      "globals": {
+        "AUTO_COLORS": "readonly",
+        "HEX_COLOR_PATTERN": "readonly",
+        "safeColor": "readonly",
+        "escapeHtml": "readonly",
+        "formatAge": "readonly",
+        "showUndoToast": "readonly",
+        "dismissActiveToast": "readonly",
+        "TOAST_DURATION_MS": "readonly",
+        "initSearch": "readonly",
+        "getSearchQuery": "readonly",
+        "clearSearch": "readonly",
+        "filterSessionList": "readonly",
+        "currentSearchQuery": "writable"
+      }
+    }
+  ]
+}

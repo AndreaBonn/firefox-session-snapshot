@@ -58,6 +58,22 @@ async function captureTabScroll(tabId) {
   }
 }
 
+// --- Build tabs array from window ---
+
+async function buildTabsFromWindow(windowId) {
+  const currentWindow = await browser.windows.get(windowId, { populate: true });
+  return currentWindow.tabs.filter((tab) => !isExcludedUrl(tab.url)).map((tab) => ({
+    index: tab.index,
+    url: tab.url,
+    title: tab.title,
+    favIconUrl: tab.favIconUrl || null,
+    active: tab.active,
+    pinned: tab.pinned,
+    scrollX: 0,
+    scrollY: 0,
+  }));
+}
+
 // --- Core: save session ---
 
 async function saveSession(name, color) {
@@ -215,6 +231,9 @@ async function restoreSession(sessionId) {
   });
   await browser.storage.local.set({ [STORAGE_PENDING_SCROLL_KEY]: scrollMap });
 
+  // Start tracking this window for auto-sync
+  await trackWindow(newWindowId, sessionId);
+
   return { success: true, windowId: newWindowId };
 }
 
@@ -225,6 +244,10 @@ async function deleteSession(sessionId) {
   const newIndex = index.filter((id) => id !== sessionId);
   await browser.storage.local.remove(`${STORAGE_SESSION_PREFIX}${sessionId}`);
   await browser.storage.local.set({ [STORAGE_INDEX_KEY]: newIndex });
+
+  // Remove from tracked windows if present
+  await untrackSessionWindows(sessionId);
+
   return { success: true };
 }
 
@@ -255,50 +278,125 @@ async function updateSession(sessionId) {
   return saveSessionWithId(sessionId, existing.name, existing.color);
 }
 
-// --- Message listener ---
+// --- Auto-sync: tracked windows persistence ---
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Only allow mutation actions from the extension popup, not from content scripts
-  const isFromContentScript = Boolean(sender.tab);
-  const mutationActions = [
-    "save-session", "restore-session", "delete-session",
-    "rename-session", "update-session",
-  ];
+async function getTrackedWindows() {
+  const data = await browser.storage.local.get(STORAGE_TRACKED_WINDOWS_KEY);
+  return data[STORAGE_TRACKED_WINDOWS_KEY] || {};
+}
 
-  if (isFromContentScript && mutationActions.includes(message.action)) {
-    return false;
+async function setTrackedWindows(tracked) {
+  await browser.storage.local.set({ [STORAGE_TRACKED_WINDOWS_KEY]: tracked });
+}
+
+async function trackWindow(windowId, sessionId) {
+  const tracked = await getTrackedWindows();
+  tracked[windowId] = sessionId;
+  await setTrackedWindows(tracked);
+}
+
+async function untrackWindow(windowId) {
+  const tracked = await getTrackedWindows();
+  delete tracked[windowId];
+  await setTrackedWindows(tracked);
+}
+
+async function untrackSessionWindows(sessionId) {
+  const tracked = await getTrackedWindows();
+  const updated = {};
+  for (const [wId, sId] of Object.entries(tracked)) {
+    if (sId !== sessionId) updated[wId] = sId;
+  }
+  await setTrackedWindows(updated);
+}
+
+// --- Auto-sync: debounced sync ---
+
+const syncTimers = {};
+
+function scheduleSyncForWindow(windowId) {
+  if (syncTimers[windowId]) {
+    clearTimeout(syncTimers[windowId]);
+  }
+  syncTimers[windowId] = setTimeout(async () => {
+    delete syncTimers[windowId];
+    await syncTrackedWindow(windowId);
+  }, AUTO_SYNC_DEBOUNCE_MS);
+}
+
+async function syncTrackedWindow(windowId) {
+  const tracked = await getTrackedWindows();
+  const sessionId = tracked[windowId];
+  if (!sessionId) return;
+
+  const session = await getSession(sessionId);
+  if (!session) {
+    await untrackWindow(windowId);
+    return;
   }
 
-  // Validate sessionId format for actions that require it
-  const needsSessionId = [
-    "restore-session", "delete-session", "rename-session", "update-session",
-  ];
-  if (needsSessionId.includes(message.action) && !isValidSessionId(message.sessionId)) {
-    sendResponse({ success: false, error: "ID sessione non valido" });
-    return true;
+  try {
+    const tabs = await buildTabsFromWindow(windowId);
+    if (tabs.length === 0) return;
+
+    const updatedSession = {
+      ...session,
+      updatedAt: Date.now(),
+      windowId,
+      tabs,
+      tabCount: tabs.length,
+    };
+
+    await browser.storage.local.set({
+      [`${STORAGE_SESSION_PREFIX}${sessionId}`]: updatedSession,
+    });
+  } catch {
+    // Window may have been closed between schedule and execution
+    await untrackWindow(windowId);
+  }
+}
+
+// --- Auto-sync: event listeners ---
+
+browser.tabs.onCreated.addListener(async (tab) => {
+  if (!tab.windowId) return;
+  const tracked = await getTrackedWindows();
+  if (tracked[tab.windowId]) {
+    scheduleSyncForWindow(tab.windowId);
+  }
+});
+
+browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+  if (removeInfo.isWindowClosing) return;
+  const tracked = await getTrackedWindows();
+  if (tracked[removeInfo.windowId]) {
+    scheduleSyncForWindow(removeInfo.windowId);
+  }
+});
+
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  // Scroll restore (existing feature)
+  if (changeInfo.status === "complete") {
+    await restorePendingScroll(tabId);
   }
 
-  const handlers = {
-    "get-sessions": () => getSessions(),
-    "save-session": () => saveSession(message.name, message.color),
-    "restore-session": () => restoreSession(message.sessionId),
-    "delete-session": () => deleteSession(message.sessionId),
-    "rename-session": () => renameSession(message.sessionId, message.name),
-    "update-session": () => updateSession(message.sessionId),
-  };
-
-  const handler = handlers[message.action];
-  if (handler) {
-    handler().then(sendResponse);
-    return true;
+  // Auto-sync on URL change (navigation completed)
+  if (changeInfo.url && tab.windowId) {
+    const tracked = await getTrackedWindows();
+    if (tracked[tab.windowId]) {
+      scheduleSyncForWindow(tab.windowId);
+    }
   }
+});
+
+browser.windows.onRemoved.addListener(async (windowId) => {
+  await untrackWindow(windowId);
+  delete syncTimers[windowId];
 });
 
 // --- Scroll restore on tab load ---
 
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-  if (changeInfo.status !== "complete") return;
-
+async function restorePendingScroll(tabId) {
   const data = await browser.storage.local.get(STORAGE_PENDING_SCROLL_KEY);
   const scrollMap = data[STORAGE_PENDING_SCROLL_KEY] || {};
 
@@ -316,6 +414,44 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
 
   delete scrollMap[tabId];
   await browser.storage.local.set({ [STORAGE_PENDING_SCROLL_KEY]: scrollMap });
+}
+
+// --- Message listener ---
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  const isFromContentScript = Boolean(sender.tab);
+  const mutationActions = [
+    "save-session", "restore-session", "delete-session",
+    "rename-session", "update-session",
+  ];
+
+  if (isFromContentScript && mutationActions.includes(message.action)) {
+    return false;
+  }
+
+  const needsSessionId = [
+    "restore-session", "delete-session", "rename-session", "update-session",
+  ];
+  if (needsSessionId.includes(message.action) && !isValidSessionId(message.sessionId)) {
+    sendResponse({ success: false, error: "ID sessione non valido" });
+    return true;
+  }
+
+  const handlers = {
+    "get-sessions": () => getSessions(),
+    "save-session": () => saveSession(message.name, message.color),
+    "restore-session": () => restoreSession(message.sessionId),
+    "delete-session": () => deleteSession(message.sessionId),
+    "rename-session": () => renameSession(message.sessionId, message.name),
+    "update-session": () => updateSession(message.sessionId),
+    "get-tracked-windows": () => getTrackedWindows(),
+  };
+
+  const handler = handlers[message.action];
+  if (handler) {
+    handler().then(sendResponse);
+    return true;
+  }
 });
 
 // --- Keyboard shortcut handler ---

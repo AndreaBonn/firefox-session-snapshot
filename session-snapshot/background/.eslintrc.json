@@ -12,6 +12,8 @@
         "STORAGE_INDEX_KEY": "readonly",
         "STORAGE_SESSION_PREFIX": "readonly",
         "STORAGE_PENDING_SCROLL_KEY": "readonly",
+        "STORAGE_TRACKED_WINDOWS_KEY": "readonly",
+        "AUTO_SYNC_DEBOUNCE_MS": "readonly",
         "AUTO_COLORS": "readonly",
         "EXCLUDED_URL_PREFIXES": "readonly",
         "ALLOWED_URL_SCHEMES": "readonly",

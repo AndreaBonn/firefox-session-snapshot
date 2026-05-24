@@ -4,6 +4,8 @@
 const STORAGE_INDEX_KEY = "snapshot_index";
 const STORAGE_SESSION_PREFIX = "snapshot_";
 const STORAGE_PENDING_SCROLL_KEY = "snapshot_pending_scroll";
+const STORAGE_TRACKED_WINDOWS_KEY = "snapshot_tracked_windows";
+const AUTO_SYNC_DEBOUNCE_MS = 2000;
 
 const AUTO_COLORS = [
   "#0969da", "#1a7f37", "#9a3412", "#6e40c9",

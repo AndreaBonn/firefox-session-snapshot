@@ -11,6 +11,9 @@ const popupHtml = fs.readFileSync(
 describe("popup: formatAge", () => {
   beforeAll(() => {
     document.documentElement.innerHTML = popupHtml;
+    loadScript("popup/ui-utils.js");
+    loadScript("popup/toast.js");
+    loadScript("popup/search.js");
     loadScript("popup/popup.js");
   });
 

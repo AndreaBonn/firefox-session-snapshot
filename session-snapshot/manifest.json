@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Session Snapshot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Salva e ripristina sessioni di lavoro per progetto. Ogni sessione ricorda schede e posizione di scroll.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -12,7 +12,8 @@
   "permissions": [
     "tabs",
     "storage",
-    "activeTab"
+    "activeTab",
+    "windows"
   ],
   "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
   "background": {

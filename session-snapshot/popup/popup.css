@@ -344,77 +344,169 @@ body {
   box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
 }
 
-/* --- Confirm dialog --- */
-
-#ss-confirm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#ss-confirm-overlay.hidden {
-  display: none;
-}
-
-#ss-confirm-dialog {
-  background: var(--ss-bg);
-  border: 1px solid var(--ss-border);
-  border-radius: 8px;
-  padding: 16px;
-  width: 280px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-#ss-confirm-message {
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.4;
-}
-
-#ss-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-#ss-confirm-cancel {
-  padding: 6px 12px;
-  background: transparent;
-  border: 1px solid var(--ss-border);
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--ss-text-primary);
-}
-
-#ss-confirm-cancel:hover {
-  background: var(--ss-hover);
-}
-
-#ss-confirm-ok {
-  padding: 6px 12px;
-  background: var(--ss-danger);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-#ss-confirm-ok:hover {
-  background: var(--ss-danger-hover);
-}
-
 /* --- Empty state --- */
 
-#ss-empty-state {
+#ss-empty-state,
+#ss-no-results {
   padding: 32px 16px;
   text-align: center;
   color: var(--ss-text-secondary);
   font-size: 13px;
   line-height: 1.6;
+}
+
+/* --- Search bar --- */
+
+#ss-sessions-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#ss-search-wrapper {
+  padding: 0 16px 6px;
+}
+
+#ss-search-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--ss-border);
+  border-radius: 6px;
+  background: var(--ss-bg);
+  color: var(--ss-text-primary);
+  font-size: 13px;
+  font-family: var(--ss-font);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#ss-search-input:focus {
+  border-color: var(--ss-accent);
+  box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.12);
+}
+
+#ss-search-input::placeholder {
+  color: var(--ss-text-secondary);
+}
+
+/* Hide browser-default search clear button for consistent look */
+#ss-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* --- Toast notifications --- */
+
+#ss-toast-container {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.ss-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--ss-text-primary);
+  color: var(--ss-bg);
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+  animation: ss-toast-in 0.25s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.ss-toast-exit {
+  animation: ss-toast-out 0.3s ease-in forwards;
+}
+
+.ss-toast-message {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-toast-undo {
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--ss-accent);
+  border: 1px solid var(--ss-accent);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.ss-toast-undo:hover {
+  background: rgba(9, 105, 218, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ss-toast-undo {
+    color: var(--ss-accent);
+    border-color: var(--ss-accent);
+  }
+
+  .ss-toast-undo:hover {
+    background: rgba(88, 166, 255, 0.15);
+  }
+}
+
+.ss-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--ss-accent);
+  transform-origin: left;
+  transform: scaleX(1);
+}
+
+.ss-toast-progress-active {
+  animation: ss-toast-countdown linear forwards;
+}
+
+@keyframes ss-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ss-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes ss-toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
