@@ -117,9 +117,4 @@ function translatePage() {
     const key = el.getAttribute("data-i18n-title");
     if (key) el.title = t(key);
   });
-
-  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
-    const key = el.getAttribute("data-i18n-html");
-    if (key) el.innerHTML = t(key);
-  });
 }
