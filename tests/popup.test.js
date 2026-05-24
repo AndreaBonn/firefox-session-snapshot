@@ -11,6 +11,8 @@ describe("popup: formatAge", () => {
     loadScript("popup/ui-utils.js");
     loadScript("popup/toast.js");
     loadScript("popup/search.js");
+    loadScript("popup/tags.js");
+    loadScript("popup/export-import.js");
     loadScript("popup/popup.js");
   });
 
@@ -113,12 +115,70 @@ describe("popup: renderSession", () => {
   });
 });
 
+describe("popup: renderSession with tags", () => {
+  test("renders tag pills when session has tags", () => {
+    const html = renderSession({
+      id: "sess_100",
+      name: "Tagged",
+      color: "#0969da",
+      tabCount: 2,
+      updatedAt: Date.now(),
+      tags: ["work", "urgent"],
+    });
+
+    expect(html).toContain("ss-tag-pill");
+    expect(html).toContain("work");
+    expect(html).toContain("urgent");
+  });
+
+  test("renders without tag section when no tags", () => {
+    const html = renderSession({
+      id: "sess_100",
+      name: "No Tags",
+      color: "#0969da",
+      tabCount: 1,
+      updatedAt: Date.now(),
+      tags: [],
+    });
+
+    expect(html).not.toContain("ss-session-tags");
+  });
+
+  test("renders without tag section when tags undefined", () => {
+    const html = renderSession({
+      id: "sess_100",
+      name: "Legacy",
+      color: "#0969da",
+      tabCount: 1,
+      updatedAt: Date.now(),
+    });
+
+    expect(html).not.toContain("ss-session-tags");
+  });
+
+  test("escapes tag content in HTML", () => {
+    const html = renderSession({
+      id: "sess_100",
+      name: "Test",
+      color: "#0969da",
+      tabCount: 1,
+      updatedAt: Date.now(),
+      tags: ["<script>"],
+    });
+
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&lt;script&gt;");
+  });
+});
+
 describe("popup: renderContextMenu", () => {
-  test("renders menu with update, rename, and delete actions", () => {
+  test("renders menu with all actions", () => {
     const html = renderContextMenu("sess_100");
 
     expect(html).toContain('data-action="update"');
     expect(html).toContain('data-action="rename"');
+    expect(html).toContain('data-action="edit-tags"');
+    expect(html).toContain('data-action="export-one"');
     expect(html).toContain('data-action="delete"');
     expect(html).toContain('data-id="sess_100"');
   });

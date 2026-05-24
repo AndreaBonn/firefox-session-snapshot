@@ -5,6 +5,9 @@ const storageMock = (() => {
   return {
     local: {
       get: jest.fn(async (keys) => {
+        if (keys === null || keys === undefined) {
+          return { ...store };
+        }
         if (typeof keys === "string") {
           return { [keys]: store[keys] ?? undefined };
         }

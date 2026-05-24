@@ -1,7 +1,11 @@
 const { loadScript } = require("./helpers");
 
-// Load scripts in manifest order - validation first, then background
+// Load scripts in manifest order
 loadScript("background/validation.js");
+loadScript("background/storage.js");
+loadScript("background/session-crud.js");
+loadScript("background/auto-sync.js");
+loadScript("background/export-import.js");
 loadScript("background/background.js");
 
 describe("background: storage helpers", () => {
@@ -854,5 +858,484 @@ describe("background: listener registration", () => {
 
   test("registers commands listener for keyboard shortcuts", () => {
     expect(listenerCounts.onCommand).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// === NEW FEATURE TESTS ===
+
+describe("validation: tag sanitization", () => {
+  test("sanitizeTag trims and lowercases", () => {
+    expect(sanitizeTag("  Lavoro  ")).toBe("lavoro");
+  });
+
+  test("sanitizeTag truncates to max length", () => {
+    const longTag = "a".repeat(30);
+    expect(sanitizeTag(longTag).length).toBe(MAX_TAG_LENGTH);
+  });
+
+  test("sanitizeTag rejects invalid characters", () => {
+    expect(sanitizeTag("<script>")).toBe("");
+    expect(sanitizeTag("tag;drop")).toBe("");
+  });
+
+  test("sanitizeTag accepts accented characters", () => {
+    expect(sanitizeTag("progettò")).toBe("progettò");
+    expect(sanitizeTag("café")).toBe("café");
+  });
+
+  test("sanitizeTag returns empty for non-string", () => {
+    expect(sanitizeTag(null)).toBe("");
+    expect(sanitizeTag(123)).toBe("");
+  });
+
+  test("sanitizeTags deduplicates and limits to max", () => {
+    const tags = ["a", "b", "a", "c", "d", "e", "f"];
+    const result = sanitizeTags(tags);
+    expect(result).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  test("sanitizeTags filters invalid tags", () => {
+    const tags = ["valid", "<bad>", "ok", null, "fine"];
+    const result = sanitizeTags(tags);
+    expect(result).toEqual(["valid", "ok", "fine"]);
+  });
+
+  test("sanitizeTags returns empty array for non-array", () => {
+    expect(sanitizeTags(null)).toEqual([]);
+    expect(sanitizeTags("string")).toEqual([]);
+  });
+});
+
+describe("session-crud: saveSession with tags", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+    browser.windows.getCurrent.mockResolvedValue({
+      id: 1,
+      tabs: [
+        {
+          id: 101,
+          index: 0,
+          url: "https://example.com",
+          title: "Example",
+          favIconUrl: null,
+          active: true,
+          pinned: false,
+        },
+      ],
+    });
+    browser.tabs.sendMessage.mockResolvedValue({ x: 0, y: 0 });
+  });
+
+  test("saves session with tags", async () => {
+    const result = await saveSession("Tagged", "#0969da", ["work", "urgent"]);
+    expect(result.success).toBe(true);
+    expect(result.session.tags).toEqual(["work", "urgent"]);
+  });
+
+  test("sanitizes invalid tags on save", async () => {
+    const result = await saveSession("Test", null, ["valid", "<bad>", null]);
+    expect(result.session.tags).toEqual(["valid"]);
+  });
+
+  test("saves empty tags array when none provided", async () => {
+    const result = await saveSession("Test", null, []);
+    expect(result.session.tags).toEqual([]);
+  });
+});
+
+describe("session-crud: updateSessionTags", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("updates tags on existing session", async () => {
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: {
+        id: "sess_100",
+        name: "Test",
+        tags: ["old"],
+        updatedAt: 1000,
+      },
+    });
+
+    const result = await updateSessionTags("sess_100", ["new", "tags"]);
+    expect(result.success).toBe(true);
+    expect(result.session.tags).toEqual(["new", "tags"]);
+    expect(result.session.updatedAt).toBeGreaterThan(1000);
+  });
+
+  test("fails for non-existent session", async () => {
+    const result = await updateSessionTags("sess_999", ["tag"]);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("background: deferred delete", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("scheduleDelete returns success immediately", () => {
+    const result = scheduleDelete("sess_100");
+    expect(result.success).toBe(true);
+    // Cleanup: cancel the scheduled timer
+    cancelDelete("sess_100");
+  });
+
+  test("cancelDelete returns success", () => {
+    scheduleDelete("sess_100");
+    const result = cancelDelete("sess_100");
+    expect(result.success).toBe(true);
+  });
+
+  test("cancelDelete is idempotent (no error if no pending delete)", () => {
+    const result = cancelDelete("sess_nonexistent");
+    expect(result.success).toBe(true);
+  });
+
+  test("scheduleDelete registers a pending timer entry", () => {
+    scheduleDelete("sess_100");
+    // The pendingDeletes map should have an entry
+    expect(pendingDeletes["sess_100"]).toBeDefined();
+    cancelDelete("sess_100");
+  });
+
+  test("cancelDelete removes the pending timer entry", () => {
+    scheduleDelete("sess_100");
+    cancelDelete("sess_100");
+    expect(pendingDeletes["sess_100"]).toBeUndefined();
+  });
+
+  test("re-scheduling replaces the previous timer", () => {
+    scheduleDelete("sess_100");
+    const firstTimer = pendingDeletes["sess_100"];
+
+    scheduleDelete("sess_100");
+    const secondTimer = pendingDeletes["sess_100"];
+
+    // Timer IDs should be different (old was cleared, new was created)
+    expect(secondTimer).not.toBe(firstTimer);
+    cancelDelete("sess_100");
+  });
+
+  test("deleteSession is called after timeout expires", (done) => {
+    browser.storage.local
+      .set({
+        snapshot_index: ["sess_100"],
+        snapshot_sess_100: { id: "sess_100", name: "Test" },
+      })
+      .then(() => {
+        // Manually create a short-delay delete to test the mechanism
+        pendingDeletes["sess_100"] = setTimeout(async () => {
+          delete pendingDeletes["sess_100"];
+          await deleteSession("sess_100");
+
+          const store = browser.storage._getStore();
+          expect(store.snapshot_index).toEqual([]);
+          expect(store.snapshot_sess_100).toBeUndefined();
+          done();
+        }, 50);
+      });
+  });
+});
+
+describe("export-import: exportSessions", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("exports all sessions with correct format", async () => {
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: {
+        id: "sess_100",
+        name: "Export Test",
+        createdAt: 1000,
+        updatedAt: 2000,
+        color: "#0969da",
+        tags: ["work"],
+        windowId: 1,
+        tabs: [
+          {
+            index: 0,
+            url: "https://example.com",
+            title: "Example",
+            favIconUrl: null,
+            active: true,
+            pinned: false,
+            scrollX: 0,
+            scrollY: 100,
+          },
+        ],
+        tabCount: 1,
+      },
+    });
+
+    const result = await exportSessions();
+
+    expect(result.version).toBe(1);
+    expect(result.exportedAt).toBeDefined();
+    expect(result.sessions).toHaveLength(1);
+    expect(result.sessions[0].name).toBe("Export Test");
+    expect(result.sessions[0].tabs[0].url).toBe("https://example.com");
+    // Internal fields should be stripped
+    expect(result.sessions[0].id).toBeUndefined();
+    expect(result.sessions[0].windowId).toBeUndefined();
+    expect(result.sessions[0].tabCount).toBeUndefined();
+  });
+
+  test("exports empty array when no sessions", async () => {
+    const result = await exportSessions();
+    expect(result.sessions).toEqual([]);
+  });
+});
+
+describe("export-import: exportSingleSession", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("exports a single session", async () => {
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: {
+        id: "sess_100",
+        name: "Single",
+        createdAt: 1000,
+        updatedAt: 2000,
+        color: "#0969da",
+        tags: [],
+        tabs: [{ url: "https://a.com", title: "A", pinned: false, scrollX: 0, scrollY: 0 }],
+      },
+    });
+
+    const result = await exportSingleSession("sess_100");
+    expect(result.success).toBe(true);
+    expect(result.data.sessions).toHaveLength(1);
+    expect(result.data.sessions[0].name).toBe("Single");
+  });
+
+  test("fails for non-existent session", async () => {
+    const result = await exportSingleSession("sess_999");
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("export-import: importSessions", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("imports valid JSON with sessions", async () => {
+    const data = {
+      version: 1,
+      sessions: [
+        {
+          name: "Imported",
+          createdAt: 1000,
+          color: "#1a7f37",
+          tags: ["import"],
+          tabs: [{ url: "https://example.com", title: "Ex", pinned: false }],
+        },
+      ],
+    };
+
+    const result = await importSessions(JSON.stringify(data));
+
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(1);
+
+    const store = browser.storage._getStore();
+    const index = store.snapshot_index;
+    expect(index).toHaveLength(1);
+
+    const session = store[`snapshot_${index[0]}`];
+    expect(session.name).toBe("Imported");
+    expect(session.tags).toEqual(["import"]);
+    expect(session.tabs[0].url).toBe("https://example.com");
+  });
+
+  test("rejects invalid JSON", async () => {
+    const result = await importSessions("not json");
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("JSON");
+  });
+
+  test("rejects data without sessions array", async () => {
+    const result = await importSessions(JSON.stringify({ foo: "bar" }));
+    expect(result.success).toBe(false);
+  });
+
+  test("rejects empty sessions array", async () => {
+    const result = await importSessions(JSON.stringify({ sessions: [] }));
+    expect(result.success).toBe(false);
+  });
+
+  test("skips sessions with no valid tabs", async () => {
+    const data = {
+      sessions: [
+        {
+          name: "No tabs",
+          tabs: [{ url: "javascript:alert(1)", title: "Bad" }],
+        },
+      ],
+    };
+
+    const result = await importSessions(JSON.stringify(data));
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(0);
+  });
+
+  test("deduplicates names on import", async () => {
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100"],
+      snapshot_sess_100: { id: "sess_100", name: "My Session" },
+    });
+
+    const data = {
+      sessions: [
+        {
+          name: "My Session",
+          tabs: [{ url: "https://example.com", title: "Ex" }],
+        },
+      ],
+    };
+
+    const result = await importSessions(JSON.stringify(data));
+    expect(result.success).toBe(true);
+
+    const store = browser.storage._getStore();
+    const index = store.snapshot_index;
+    const imported = store[`snapshot_${index[0]}`];
+    expect(imported.name).toBe("My Session (2)");
+  });
+
+  test("sanitizes imported tags", async () => {
+    const data = {
+      sessions: [
+        {
+          name: "Tagged",
+          tags: ["valid", "<script>", "ok"],
+          tabs: [{ url: "https://example.com", title: "Ex" }],
+        },
+      ],
+    };
+
+    const result = await importSessions(JSON.stringify(data));
+    expect(result.success).toBe(true);
+
+    const store = browser.storage._getStore();
+    const index = store.snapshot_index;
+    const session = store[`snapshot_${index[0]}`];
+    expect(session.tags).toEqual(["valid", "ok"]);
+  });
+
+  test("generates unique IDs for imported sessions", async () => {
+    const data = {
+      sessions: [
+        {
+          name: "A",
+          tabs: [{ url: "https://a.com", title: "A" }],
+        },
+        {
+          name: "B",
+          tabs: [{ url: "https://b.com", title: "B" }],
+        },
+      ],
+    };
+
+    const result = await importSessions(JSON.stringify(data));
+    expect(result.count).toBe(2);
+
+    const store = browser.storage._getStore();
+    const index = store.snapshot_index;
+    expect(new Set(index).size).toBe(2);
+  });
+});
+
+describe("export-import: round-trip", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+    browser.windows.getCurrent.mockResolvedValue({
+      id: 1,
+      tabs: [
+        {
+          id: 101,
+          index: 0,
+          url: "https://example.com",
+          title: "Example",
+          favIconUrl: "https://example.com/fav.ico",
+          active: true,
+          pinned: false,
+        },
+      ],
+    });
+    browser.tabs.sendMessage.mockResolvedValue({ x: 0, y: 250 });
+  });
+
+  test("export then import preserves session data", async () => {
+    await saveSession("Round Trip", "#6e40c9", ["test", "roundtrip"]);
+
+    const exported = await exportSessions();
+    const exportJson = JSON.stringify(exported);
+
+    // Clear storage
+    resetBrowserMocks();
+
+    const result = await importSessions(exportJson);
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(1);
+
+    const store = browser.storage._getStore();
+    const index = store.snapshot_index;
+    const session = store[`snapshot_${index[0]}`];
+
+    expect(session.name).toBe("Round Trip");
+    expect(session.color).toBe("#6e40c9");
+    expect(session.tags).toEqual(["test", "roundtrip"]);
+    expect(session.tabs[0].url).toBe("https://example.com");
+    expect(session.tabs[0].scrollY).toBe(250);
+  });
+});
+
+describe("export-import: getStorageStats", () => {
+  beforeEach(() => {
+    resetBrowserMocks();
+  });
+
+  test("returns bytes used and session count", async () => {
+    await browser.storage.local.set({
+      snapshot_index: ["sess_100", "sess_200"],
+      snapshot_sess_100: { id: "sess_100", name: "A" },
+      snapshot_sess_200: { id: "sess_200", name: "B" },
+    });
+
+    const stats = await getStorageStats();
+
+    expect(stats.bytesUsed).toBeGreaterThan(0);
+    expect(stats.sessionCount).toBe(2);
+  });
+
+  test("returns zero for empty storage", async () => {
+    const stats = await getStorageStats();
+    expect(stats.sessionCount).toBe(0);
+    expect(stats.bytesUsed).toBeGreaterThan(0); // Empty JSON {} still has size
+  });
+});
+
+describe("validation: session ID patterns", () => {
+  test("accepts standard session IDs", () => {
+    expect(isValidSessionId("sess_1234567890")).toBe(true);
+  });
+
+  test("accepts import-generated session IDs", () => {
+    expect(isValidSessionId("sess_1234567890_abc123")).toBe(true);
+  });
+
+  test("rejects malformed import IDs", () => {
+    expect(isValidSessionId("sess_123_")).toBe(false);
+    expect(isValidSessionId("sess_abc_def")).toBe(false);
+    expect(isValidSessionId("sess__abc")).toBe(false);
   });
 });
