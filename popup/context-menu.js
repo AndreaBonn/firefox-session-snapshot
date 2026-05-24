@@ -16,9 +16,7 @@ function toggleContextMenu(sessionId) {
   if (!item) return;
 
   const menuBtn = item.querySelector(".ss-menu-btn");
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = renderContextMenu(sessionId);
-  const menuEl = wrapper.firstElementChild;
+  const menuEl = createContextMenu(sessionId);
   document.body.appendChild(menuEl);
 
   const btnRect = menuBtn.getBoundingClientRect();
@@ -38,27 +36,35 @@ function toggleContextMenu(sessionId) {
   openMenuId = sessionId;
 }
 
-function renderContextMenu(sessionId) {
-  return `
-    <div class="ss-context-menu" data-id="${sessionId}">
-      <button class="ss-menu-item" data-action="update">
-        ${t("menu.update")}
-      </button>
-      <button class="ss-menu-item" data-action="rename">
-        ${t("menu.rename")}
-      </button>
-      <button class="ss-menu-item" data-action="edit-tags">
-        ${t("menu.edit_tags")}
-      </button>
-      <button class="ss-menu-item" data-action="export-one">
-        ${t("menu.export")}
-      </button>
-      <hr />
-      <button class="ss-menu-item ss-danger" data-action="delete">
-        ${t("menu.delete")}
-      </button>
-    </div>
-  `;
+function createContextMenu(sessionId) {
+  const menu = document.createElement("div");
+  menu.className = "ss-context-menu";
+  menu.dataset.id = sessionId;
+
+  const actions = [
+    { action: "update", label: t("menu.update") },
+    { action: "rename", label: t("menu.rename") },
+    { action: "edit-tags", label: t("menu.edit_tags") },
+    { action: "export-one", label: t("menu.export") },
+  ];
+
+  actions.forEach(({ action, label }) => {
+    const btn = document.createElement("button");
+    btn.className = "ss-menu-item";
+    btn.dataset.action = action;
+    btn.textContent = label;
+    menu.appendChild(btn);
+  });
+
+  menu.appendChild(document.createElement("hr"));
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "ss-menu-item ss-danger";
+  deleteBtn.dataset.action = "delete";
+  deleteBtn.textContent = t("menu.delete");
+  menu.appendChild(deleteBtn);
+
+  return menu;
 }
 
 function closeContextMenu() {

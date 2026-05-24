@@ -19,13 +19,19 @@ function resetSaveTags() {
 
 function renderSaveTags() {
   const container = document.getElementById("ss-tag-list");
-  container.innerHTML = saveTags.map(renderRemovableTag).join("");
+  container.replaceChildren(...saveTags.map(createRemovableTag));
 }
 
-function renderRemovableTag(tag, index) {
-  return `<span class="ss-tag-pill ss-tag-removable" data-index="${index}">
-    ${escapeHtml(tag)} <span class="ss-tag-remove">&times;</span>
-  </span>`;
+function createRemovableTag(tag, index) {
+  const pill = document.createElement("span");
+  pill.className = "ss-tag-pill ss-tag-removable";
+  pill.dataset.index = index;
+  pill.append(tag + " ");
+  const remove = document.createElement("span");
+  remove.className = "ss-tag-remove";
+  remove.textContent = "\u00D7";
+  pill.appendChild(remove);
+  return pill;
 }
 
 function bindTagInput(inputId, renderFn, getTagsFn, setTagsFn) {
@@ -82,16 +88,16 @@ function openTagEditor(sessionId, cachedSessions) {
 
 function renderTagEditorList() {
   const container = document.getElementById("ss-tag-editor-list");
-  container.innerHTML = tagEditorTags.map(renderRemovableTag).join("");
-
-  container.querySelectorAll(".ss-tag-remove").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const pill = btn.closest(".ss-tag-removable");
-      const index = parseInt(pill.dataset.index, 10);
-      tagEditorTags.splice(index, 1);
-      renderTagEditorList();
-    });
-  });
+  container.replaceChildren(
+    ...tagEditorTags.map((tag, index) => {
+      const pill = createRemovableTag(tag, index);
+      pill.querySelector(".ss-tag-remove").addEventListener("click", () => {
+        tagEditorTags.splice(index, 1);
+        renderTagEditorList();
+      });
+      return pill;
+    })
+  );
 }
 
 async function closeTagEditor(onDone) {

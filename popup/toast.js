@@ -17,16 +17,21 @@ function showUndoToast(message, onConfirm, onUndo) {
 
   const progressId = `toast-progress-${Date.now()}`;
 
-  toast.innerHTML = `
-    <span class="ss-toast-message">${escapeHtml(message)}</span>
-    <button class="ss-toast-undo" type="button">${t("toast.undo")}</button>
-    <div class="ss-toast-progress" id="${progressId}"></div>
-  `;
+  const msgSpan = document.createElement("span");
+  msgSpan.className = "ss-toast-message";
+  msgSpan.textContent = message;
+  const undoBtn = document.createElement("button");
+  undoBtn.className = "ss-toast-undo";
+  undoBtn.type = "button";
+  undoBtn.textContent = t("toast.undo");
+  const progressDiv = document.createElement("div");
+  progressDiv.className = "ss-toast-progress";
+  progressDiv.id = progressId;
+  toast.append(msgSpan, undoBtn, progressDiv);
 
   container.appendChild(toast);
 
-  const undoBtn = toast.querySelector(".ss-toast-undo");
-  const progressBar = toast.querySelector(`#${progressId}`);
+  const progressBar = progressDiv;
   let undone = false;
 
   progressBar.style.animationDuration = `${TOAST_DURATION_MS}ms`;
@@ -59,7 +64,10 @@ function showInfoToast(message) {
   toast.className = "ss-toast";
   toast.setAttribute("role", "status");
 
-  toast.innerHTML = `<span class="ss-toast-message">${escapeHtml(message)}</span>`;
+  const msgSpan = document.createElement("span");
+  msgSpan.className = "ss-toast-message";
+  msgSpan.textContent = message;
+  toast.appendChild(msgSpan);
   container.appendChild(toast);
 
   const timeoutId = setTimeout(() => {

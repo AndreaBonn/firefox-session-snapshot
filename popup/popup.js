@@ -39,15 +39,14 @@ async function loadSessions() {
 
   if (cachedSessions.length === 0) {
     list.classList.add("hidden");
-    list.innerHTML = "";
+    list.replaceChildren();
     empty.classList.remove("hidden");
     count.textContent = t("sessions.empty");
     return;
   }
 
   count.textContent = t("sessions.count", { count: cachedSessions.length });
-  list.innerHTML = cachedSessions.map(renderSession).join("");
-  applySessionColors(list);
+  list.replaceChildren(...cachedSessions.map(createSessionElement));
   list.classList.remove("hidden");
   empty.classList.add("hidden");
   openMenuId = null;
@@ -55,54 +54,78 @@ async function loadSessions() {
   filterSessionList();
 }
 
-function applySessionColors(container) {
-  container.querySelectorAll(".ss-session-color[data-color]").forEach((dot) => {
-    dot.style.backgroundColor = dot.dataset.color;
-  });
-}
-
-function renderSession(session) {
+function createSessionElement(session) {
   const age = formatAge(session.updatedAt);
-  const tags = (session.tags || [])
-    .map((tag) => `<span class="ss-tag-pill">${escapeHtml(tag)}</span>`)
-    .join("");
-  const tagsHtml = tags ? `<div class="ss-session-tags">${tags}</div>` : "";
 
-  return `
-    <div class="ss-session-item" data-id="${session.id}">
-      <div class="ss-session-color" data-color="${safeColor(session.color)}"></div>
-      <div class="ss-session-info">
-        <div class="ss-session-name">${escapeHtml(session.name)}</div>
-        <div class="ss-session-meta">
-          ${t("session.tabs", { count: session.tabCount })} &middot; ${age}
-        </div>
-        ${tagsHtml}
-      </div>
-      <div class="ss-session-actions">
-        <button class="ss-restore-btn" data-id="${session.id}" title="${t("session.restore_title")}">
-          &#9654;
-        </button>
-        <button class="ss-menu-btn" data-id="${session.id}" title="${t("session.options_title")}">
-          &#8942;
-        </button>
-      </div>
-    </div>
-  `;
+  const item = document.createElement("div");
+  item.className = "ss-session-item";
+  item.dataset.id = session.id;
+
+  const colorDot = document.createElement("div");
+  colorDot.className = "ss-session-color";
+  colorDot.dataset.color = safeColor(session.color);
+  colorDot.style.backgroundColor = safeColor(session.color);
+
+  const info = document.createElement("div");
+  info.className = "ss-session-info";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "ss-session-name";
+  nameEl.textContent = session.name;
+
+  const meta = document.createElement("div");
+  meta.className = "ss-session-meta";
+  meta.textContent = t("session.tabs", { count: session.tabCount }) + " \u00B7 " + age;
+
+  info.append(nameEl, meta);
+
+  if (session.tags && session.tags.length > 0) {
+    const tagsDiv = document.createElement("div");
+    tagsDiv.className = "ss-session-tags";
+    session.tags.forEach((tag) => {
+      const pill = document.createElement("span");
+      pill.className = "ss-tag-pill";
+      pill.textContent = tag;
+      tagsDiv.appendChild(pill);
+    });
+    info.appendChild(tagsDiv);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "ss-session-actions";
+
+  const restoreBtn = document.createElement("button");
+  restoreBtn.className = "ss-restore-btn";
+  restoreBtn.dataset.id = session.id;
+  restoreBtn.title = t("session.restore_title");
+  restoreBtn.textContent = "\u25B6";
+
+  const menuBtn = document.createElement("button");
+  menuBtn.className = "ss-menu-btn";
+  menuBtn.dataset.id = session.id;
+  menuBtn.title = t("session.options_title");
+  menuBtn.textContent = "\u22EE";
+
+  actions.append(restoreBtn, menuBtn);
+  item.append(colorDot, info, actions);
+
+  return item;
 }
 
 // --- Color picker ---
 
 function renderColorPicker() {
   const picker = document.getElementById("ss-color-picker");
-  picker.innerHTML = AUTO_COLORS.map(
-    (color, i) =>
-      `<div class="ss-color-dot${i === 0 ? " selected" : ""}"
-          data-color="${color}"
-          title="${color}"></div>`
-  ).join("");
-  picker.querySelectorAll(".ss-color-dot").forEach((dot) => {
-    dot.style.backgroundColor = dot.dataset.color;
-  });
+  picker.replaceChildren(
+    ...AUTO_COLORS.map((color, i) => {
+      const dot = document.createElement("div");
+      dot.className = "ss-color-dot" + (i === 0 ? " selected" : "");
+      dot.dataset.color = color;
+      dot.title = color;
+      dot.style.backgroundColor = color;
+      return dot;
+    })
+  );
   selectedColor = AUTO_COLORS[0];
 }
 
