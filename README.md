@@ -4,6 +4,9 @@
 
 A Firefox extension that saves and restores browser working sessions. Each session captures open tabs and their scroll positions, and restores them in a dedicated window with automatic sync.
 
+[![CI](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/test-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/coverage-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 ![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)

@@ -4,6 +4,9 @@
 
 Un'estensione Firefox per salvare e ripristinare sessioni di lavoro nel browser. Ogni sessione cattura le schede aperte e la posizione di scroll, ripristinandole in una finestra dedicata con sincronizzazione automatica.
 
+[![CI](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml/badge.svg)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/test-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AndreaBonn/firefox-session-snapshot/main/badges/coverage-badge.json)](https://github.com/AndreaBonn/firefox-session-snapshot/actions/workflows/ci.yml)
 ![Licenza: Apache 2.0](https://img.shields.io/badge/licenza-Apache%202.0-blue)
 ![JavaScript](https://img.shields.io/badge/javascript-ES2020-f7df1e)
 ![Firefox](https://img.shields.io/badge/firefox-%3E%3D91-ff7139)
@@ -128,14 +131,14 @@ L'estensione resta attiva fino alla chiusura di Firefox. Ripeti il passaggio 3 d
 
 ## Esecuzione locale
 
-| Comando | Descrizione |
-|---|---|
-| `npm test` | Esegui test (Jest, verbose) |
-| `npm run test:coverage` | Test con report copertura |
-| `npm run lint` | Lint con ESLint |
-| `npm run lint:fix` | Lint con auto-fix |
-| `npm run format` | Formatta con Prettier |
-| `npm run format:check` | Verifica formattazione |
+| Comando                 | Descrizione                 |
+| ----------------------- | --------------------------- |
+| `npm test`              | Esegui test (Jest, verbose) |
+| `npm run test:coverage` | Test con report copertura   |
+| `npm run lint`          | Lint con ESLint             |
+| `npm run lint:fix`      | Lint con auto-fix           |
+| `npm run format`        | Formatta con Prettier       |
+| `npm run format:check`  | Verifica formattazione      |
 
 ## Testing
 
