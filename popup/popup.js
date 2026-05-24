@@ -1,6 +1,6 @@
 // Session Snapshot - Popup UI (core)
-// Handles session list rendering, save form, context menu, and inline rename.
-// Depends on: ui-utils.js, toast.js, search.js (loaded before this file)
+// Session list, save form, context menu, inline rename, and deferred delete.
+// Depends on: ui-utils.js, toast.js, search.js, tags.js, export-import.js
 
 let selectedColor = null;
 let openMenuId = null;
@@ -11,9 +11,17 @@ let cachedSessions = [];
 document.addEventListener("DOMContentLoaded", async () => {
   renderColorPicker();
   await loadSessions();
+  await loadStorageStats();
   bindEvents();
   initSearch();
 });
+
+// --- Refresh helper (shared callback for child modules) ---
+
+async function refreshAll() {
+  await loadSessions();
+  await loadStorageStats();
+}
 
 // --- Session loading and rendering ---
 
@@ -51,6 +59,11 @@ function applySessionColors(container) {
 
 function renderSession(session) {
   const age = formatAge(session.updatedAt);
+  const tags = (session.tags || [])
+    .map((tag) => `<span class="ss-tag-pill">${escapeHtml(tag)}</span>`)
+    .join("");
+  const tagsHtml = tags ? `<div class="ss-session-tags">${tags}</div>` : "";
+
   return `
     <div class="ss-session-item" data-id="${session.id}">
       <div class="ss-session-color" data-color="${safeColor(session.color)}"></div>
@@ -59,6 +72,7 @@ function renderSession(session) {
         <div class="ss-session-meta">
           ${session.tabCount} schede &middot; ${age}
         </div>
+        ${tagsHtml}
       </div>
       <div class="ss-session-actions">
         <button class="ss-restore-btn" data-id="${session.id}" title="Ripristina in nuova finestra">
@@ -107,12 +121,17 @@ function bindEvents() {
     const name = document.getElementById("ss-session-name").value.trim();
     const color = getSelectedColor();
     try {
-      await browser.runtime.sendMessage({ action: "save-session", name, color });
+      await browser.runtime.sendMessage({
+        action: "save-session",
+        name,
+        color,
+        tags: getSaveTags(),
+      });
     } catch (err) {
       console.error("Session Snapshot: save failed -", err);
     }
     resetSaveForm();
-    await loadSessions();
+    await refreshAll();
   });
 
   document.getElementById("ss-session-name").addEventListener("keydown", (e) => {
@@ -127,6 +146,8 @@ function bindEvents() {
     dot.classList.add("selected");
     selectedColor = dot.dataset.color;
   });
+
+  initSaveTagEvents();
 
   document.getElementById("ss-sessions-list").addEventListener("click", async (e) => {
     const restoreBtn = e.target.closest(".ss-restore-btn");
@@ -158,6 +179,13 @@ function bindEvents() {
       closeContextMenu();
     }
   });
+
+  document.getElementById("ss-export-btn").addEventListener("click", handleExport);
+  document.getElementById("ss-import-input").addEventListener("change", (e) => {
+    handleImport(e, refreshAll);
+  });
+
+  initTagEditorEvents(refreshAll);
 }
 
 // --- Save form reset ---
@@ -166,6 +194,7 @@ function resetSaveForm() {
   document.getElementById("ss-save-collapsed").classList.remove("hidden");
   document.getElementById("ss-save-expanded").classList.add("hidden");
   document.getElementById("ss-session-name").value = "";
+  resetSaveTags();
   renderColorPicker();
 }
 
@@ -214,6 +243,12 @@ function renderContextMenu(sessionId) {
       <button class="ss-menu-item" data-action="rename">
         Rinomina
       </button>
+      <button class="ss-menu-item" data-action="edit-tags">
+        Gestisci tag
+      </button>
+      <button class="ss-menu-item" data-action="export-one">
+        Esporta sessione
+      </button>
       <hr />
       <button class="ss-menu-item ss-danger" data-action="delete">
         Elimina
@@ -236,33 +271,44 @@ async function handleMenuAction(action, sessionId) {
   try {
     if (action === "update") {
       await browser.runtime.sendMessage({ action: "update-session", sessionId });
-      await loadSessions();
+      await refreshAll();
     }
 
     if (action === "rename") {
       startInlineRename(sessionId);
     }
 
+    if (action === "edit-tags") {
+      openTagEditor(sessionId, cachedSessions);
+    }
+
+    if (action === "export-one") {
+      const result = await browser.runtime.sendMessage({
+        action: "export-session",
+        sessionId,
+      });
+      if (result.success) {
+        downloadJson(result.data, `session-snapshot-${sessionId}.json`);
+      }
+    }
+
     if (action === "delete") {
       const session = cachedSessions.find((s) => s.id === sessionId);
       const sessionName = session ? session.name : "Sessione";
 
-      // Optimistic removal from DOM
+      cachedSessions = cachedSessions.filter((s) => s.id !== sessionId);
       const item = document.querySelector(`.ss-session-item[data-id="${sessionId}"]`);
       if (item) item.remove();
+      updateSessionCount();
 
-      updateSessionCount(-1);
+      await browser.runtime.sendMessage({ action: "schedule-delete", sessionId });
 
       showUndoToast(
         `"${sessionName}" eliminata`,
+        () => {},
         async () => {
-          // Timer expired: actually delete
-          await browser.runtime.sendMessage({ action: "delete-session", sessionId });
-          await loadSessions();
-        },
-        async () => {
-          // Undo: restore DOM
-          await loadSessions();
+          await browser.runtime.sendMessage({ action: "cancel-delete", sessionId });
+          await refreshAll();
         }
       );
     }
@@ -271,13 +317,12 @@ async function handleMenuAction(action, sessionId) {
   }
 }
 
-function updateSessionCount(delta) {
+function updateSessionCount() {
   const count = document.getElementById("ss-sessions-count");
-  const newTotal = cachedSessions.length + delta;
-  if (newTotal <= 0) {
+  if (cachedSessions.length <= 0) {
     count.textContent = "Nessuna sessione";
   } else {
-    count.textContent = `Le tue sessioni (${newTotal})`;
+    count.textContent = `Le tue sessioni (${cachedSessions.length})`;
   }
 }
 
