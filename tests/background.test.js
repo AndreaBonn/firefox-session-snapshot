@@ -1,6 +1,7 @@
 const { loadScript } = require("./helpers");
 
 // Load scripts in manifest order
+loadScript("shared/constants.js");
 loadScript("background/validation.js");
 loadScript("background/storage.js");
 loadScript("background/session-crud.js");

@@ -1,5 +1,5 @@
 // Session Snapshot - Input validation and constants
-// Loaded first via manifest background.scripts array.
+// Loaded after shared/constants.js via manifest background.scripts array.
 
 const STORAGE_INDEX_KEY = "snapshot_index";
 const STORAGE_SESSION_PREFIX = "snapshot_";
@@ -8,22 +8,10 @@ const STORAGE_TRACKED_WINDOWS_KEY = "snapshot_tracked_windows";
 const AUTO_SYNC_DEBOUNCE_MS = 2000;
 const DEFERRED_DELETE_MS = 5000;
 
-const AUTO_COLORS = [
-  "#0969da",
-  "#1a7f37",
-  "#9a3412",
-  "#6e40c9",
-  "#b45309",
-  "#0e7490",
-  "#be185d",
-  "#374151",
-];
-
 const EXCLUDED_URL_PREFIXES = ["about:", "moz-extension:"];
 const ALLOWED_URL_SCHEMES = ["https:", "http:", "ftp:", "file:"];
 const SESSION_ID_PATTERN = /^sess_\d+$/;
 const SESSION_ID_IMPORT_PATTERN = /^sess_\d+_[a-z0-9]+$/;
-const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 const MAX_SESSION_NAME_LENGTH = 100;
 const MAX_SCROLL_VALUE = 200000;
 const MAX_TAGS_PER_SESSION = 5;

@@ -15,6 +15,7 @@
   "content_security_policy": "script-src 'self'; style-src 'self'; object-src 'self';",
   "background": {
     "scripts": [
+      "shared/constants.js",
       "shared/i18n.js",
       "background/i18n-init.js",
       "background/validation.js",

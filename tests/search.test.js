@@ -7,6 +7,7 @@ const popupHtml = fs.readFileSync(path.resolve(__dirname, "../popup/popup.html")
 describe("search: filterSessionList", () => {
   beforeAll(() => {
     document.documentElement.innerHTML = popupHtml;
+    loadScript("shared/constants.js");
     loadScript("popup/ui-utils.js");
     loadScript("popup/toast.js");
     loadScript("popup/search.js");
