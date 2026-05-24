@@ -136,7 +136,7 @@ async function restoreSession(sessionId) {
     return { success: false, error: t("error.no_valid_url_tabs") };
   }
 
-  const firstTab = safeTabs.find((t) => !t.pinned) || safeTabs[0];
+  const firstTab = safeTabs.find((tab) => !tab.pinned) || safeTabs[0];
   const newWindow = await browser.windows.create({
     url: firstTab.url,
     focused: true,
@@ -160,7 +160,7 @@ async function restoreSession(sessionId) {
     createdTabIds.push(created.id);
   }
 
-  const activeTabData = safeTabs.find((t) => t.active);
+  const activeTabData = safeTabs.find((tab) => tab.active);
   if (activeTabData) {
     const activeIndex = safeTabs.indexOf(activeTabData);
     if (createdTabIds[activeIndex]) {
