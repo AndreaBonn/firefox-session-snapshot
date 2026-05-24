@@ -34,6 +34,7 @@
   "session.restore_title": "Ripristina in nuova finestra",
   "session.options_title": "Opzioni",
   "storage.info": "{{mb}} MB usati \u00B7 {{count}} sessioni",
+  "error.save_too_fast": "Attendi un momento prima di salvare di nuovo",
   "error.no_valid_tabs": "Nessuna scheda valida da salvare",
   "error.session_not_found": "Sessione non trovata",
   "error.no_valid_url_tabs": "Nessuna scheda con URL valido",

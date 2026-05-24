@@ -34,6 +34,7 @@
   "session.restore_title": "Restore in new window",
   "session.options_title": "Options",
   "storage.info": "{{mb}} MB used \u00B7 {{count}} sessions",
+  "error.save_too_fast": "Please wait a moment before saving again",
   "error.no_valid_tabs": "No valid tabs to save",
   "error.session_not_found": "Session not found",
   "error.no_valid_url_tabs": "No tabs with valid URL",

@@ -2,6 +2,11 @@
 // Message listener, deferred delete, and keyboard shortcuts.
 // Depends on: validation.js, storage.js, session-crud.js, auto-sync.js, export-import.js
 
+// --- Save throttle ---
+
+const SAVE_THROTTLE_MS = 1000;
+let lastSaveTime = 0;
+
 // --- Deferred delete (undo-safe) ---
 
 const pendingDeletes = {};
@@ -62,7 +67,14 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   const handlers = {
     "get-sessions": () => getSessions(),
-    "save-session": () => saveSession(message.name, message.color, message.tags),
+    "save-session": () => {
+      const now = Date.now();
+      if (now - lastSaveTime < SAVE_THROTTLE_MS) {
+        return Promise.resolve({ success: false, error: t("error.save_too_fast") });
+      }
+      lastSaveTime = now;
+      return saveSession(message.name, message.color, message.tags);
+    },
     "restore-session": () => restoreSession(message.sessionId),
     "delete-session": () => deleteSession(message.sessionId),
     "schedule-delete": () => Promise.resolve(scheduleDelete(message.sessionId)),
