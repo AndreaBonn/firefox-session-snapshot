@@ -71,6 +71,17 @@
     "SEARCH_DEBOUNCE_MS": "readonly",
     "selectedColor": "writable",
     "openMenuId": "writable",
-    "cachedSessions": "writable"
+    "cachedSessions": "writable",
+    "sanitizeTag": "readonly",
+    "sanitizeTags": "readonly",
+    "MAX_TAG_LENGTH": "readonly",
+    "updateSessionTags": "readonly",
+    "scheduleDelete": "readonly",
+    "cancelDelete": "readonly",
+    "pendingDeletes": "readonly",
+    "exportSessions": "readonly",
+    "exportSingleSession": "readonly",
+    "importSessions": "readonly",
+    "getStorageStats": "readonly"
   }
 }
