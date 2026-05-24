@@ -21,13 +21,13 @@ This data never leaves your browser. There is no server, no analytics, no teleme
 
 ## Permissions explained
 
-| Permission | Why it is needed |
-|---|---|
-| `tabs` | Read the list of open tabs (URLs, titles) to save sessions |
-| `storage` | Store and retrieve saved sessions locally |
-| `activeTab` | Access the currently active tab when saving |
-| `windows` | Create new windows when restoring sessions, track restored windows for auto-sync |
-| `<all_urls>` (content script) | Inject a small script to read and restore scroll positions on any page |
+| Permission                    | Why it is needed                                                                 |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| `tabs`                        | Read the list of open tabs (URLs, titles) to save sessions                       |
+| `storage`                     | Store and retrieve saved sessions locally                                        |
+| `activeTab`                   | Access the currently active tab when saving                                      |
+| `windows`                     | Create new windows when restoring sessions, track restored windows for auto-sync |
+| `<all_urls>` (content script) | Inject a small script to read and restore scroll positions on any page           |
 
 ## Third-party services
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-12-15
 
 ### Added
+
 - Auto-sync: restored windows automatically track tab changes (add, remove, navigate) and update the saved session
 - Keyboard shortcut Ctrl+Shift+S for quick save of the current session
 - Keyboard shortcut Ctrl+Shift+W to open the popup
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Content Security Policy (CSP) enforcement
 
 ### Security
+
 - Input sanitization on session names, scroll values, and session IDs
 - URL scheme allowlist (https, http, ftp, file only)
 - HTML output escaping to prevent XSS
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-10-01
 
 ### Added
+
 - Save all tabs from the current window as a named session
 - Restore sessions in a separate window
 - Scroll position capture and restore per tab
