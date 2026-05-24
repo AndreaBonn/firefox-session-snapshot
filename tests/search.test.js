@@ -11,6 +11,8 @@ describe("search: filterSessionList", () => {
     loadScript("popup/ui-utils.js");
     loadScript("popup/toast.js");
     loadScript("popup/search.js");
+    loadScript("popup/context-menu.js");
+    loadScript("popup/inline-rename.js");
     loadScript("popup/popup.js");
   });
 

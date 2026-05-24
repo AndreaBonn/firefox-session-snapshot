@@ -14,6 +14,8 @@ describe("popup: formatAge", () => {
     loadScript("popup/search.js");
     loadScript("popup/tags.js");
     loadScript("popup/export-import.js");
+    loadScript("popup/context-menu.js");
+    loadScript("popup/inline-rename.js");
     loadScript("popup/popup.js");
   });
 
