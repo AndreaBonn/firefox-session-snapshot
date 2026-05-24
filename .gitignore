@@ -5,3 +5,4 @@ web-ext-artifacts/
 .DS_Store
 coverage/
 doc_progetto/
+.playwright-mcp/
