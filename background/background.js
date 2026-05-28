@@ -32,7 +32,7 @@ function cancelDelete(sessionId) {
 
 // --- Message listener ---
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender) => {
   const isFromContentScript = Boolean(sender.tab);
   const mutationActions = [
     "save-session",
@@ -61,8 +61,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     "export-session",
   ];
   if (needsSessionId.includes(message.action) && !isValidSessionId(message.sessionId)) {
-    sendResponse({ success: false, error: t("error.invalid_session_id") });
-    return true;
+    return Promise.resolve({ success: false, error: t("error.invalid_session_id") });
   }
 
   const handlers = {
@@ -91,9 +90,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   const handler = handlers[message.action];
   if (handler) {
-    handler().then(sendResponse);
-    return true;
+    return handler();
   }
+  return false;
 });
 
 // --- Keyboard shortcut handler ---

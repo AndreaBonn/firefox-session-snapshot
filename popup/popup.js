@@ -9,15 +9,29 @@ let cachedSessions = [];
 // --- Initialization ---
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const dictionaries = await I18N_DICTIONARIES_PROMISE;
-  await i18nInit(dictionaries);
-  translatePage();
-  initLangSwitcher();
+  try {
+    const dictionaries = await I18N_DICTIONARIES_PROMISE;
+    await i18nInit(dictionaries);
+    translatePage();
+    initLangSwitcher();
+  } catch (err) {
+    console.error("Session Snapshot: i18n init failed -", err);
+  }
+
   renderColorPicker();
-  await loadSessions();
-  await loadStorageStats();
   bindEvents();
   initSearch();
+
+  try {
+    await loadSessions();
+  } catch (err) {
+    console.error("Session Snapshot: loadSessions failed -", err);
+  }
+  try {
+    await loadStorageStats();
+  } catch (err) {
+    console.error("Session Snapshot: loadStorageStats failed -", err);
+  }
 });
 
 // --- Refresh helper (shared callback for child modules) ---
@@ -31,7 +45,7 @@ async function refreshAll() {
 
 async function loadSessions() {
   const response = await browser.runtime.sendMessage({ action: "get-sessions" });
-  cachedSessions = response.sessions || [];
+  cachedSessions = (response && response.sessions) || [];
 
   const list = document.getElementById("ss-sessions-list");
   const empty = document.getElementById("ss-empty-state");
