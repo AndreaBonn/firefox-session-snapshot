@@ -20,3 +20,21 @@ jobs:
           llm_api_key: '${{ secrets.GROQ_API_KEY }},${{ secrets.GEMINI_API_KEY }},${{ secrets.OPENAI_API_KEY }}'
           language: 'italian'
           update_changelog_file: 'true'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply Prettier formatting to CHANGELOG
+        run: |
+          git pull --ff-only
+          npm ci
+          npx prettier --write CHANGELOG.md
+          if ! git diff --quiet CHANGELOG.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "style(changelog): apply prettier formatting [skip ci]"
+            git push
+          fi
