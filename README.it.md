@@ -179,3 +179,9 @@ Rilasciato sotto Apache License 2.0. Vedi [LICENSE](./LICENSE).
 ## Supporta il progetto
 
 Se Session Snapshot ti e stato utile, lascia una [stella su GitHub](https://github.com/AndreaBonn/firefox-session-snapshot) - aiuta altri a scoprirlo.
+
+Session Snapshot e gratuita. Se ti e utile e vuoi contribuire, puoi lasciare un'offerta tramite PayPal. L'importo lo scegli tu ed e del tutto facoltativo.
+
+<p align="center">
+  <a href="https://paypal.me/AndreaBonacci19"><img src="https://img.shields.io/badge/Dona-PayPal-00457C?logo=paypal&logoColor=white&style=for-the-badge" alt="Dona con PayPal"></a>
+</p>
